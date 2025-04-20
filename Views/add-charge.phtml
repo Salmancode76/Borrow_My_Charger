@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Charge Point</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .card-box {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 30px;
+    }
+
+    .form-label {
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      border-radius: 6px;
+    }
+
+    .page-title {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="page-title">🔌 Add New Charge Point</h3>
+      <a href="homeowner_dashboard.phtml" class="btn btn-dark">Back to Dashboard</a>
+    </div>
+
+    <div class="card-box">
+      <form>
+        <div class="mb-3">
+          <label for="charge-point-name" class="form-label">Charge Point Name</label>
+          <input type="text" class="form-control" id="charge-point-name" placeholder="e.g. Home Garage Charger">
+        </div>
+
+        <div class="mb-3">
+          <label for="availability" class="form-label">Availability</label>
+          <select class="form-select" id="availability">
+            <option selected disabled>Select Availability</option>
+            <option value="available">Available</option>
+            <option value="not_available">Not Available</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="priceperkwh" class="form-label">Price per kWh</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" step="0.01" class="form-control" id="priceperkwh" placeholder="0.20">
+            <span class="input-group-text">/kWh</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="formFile" class="form-label">Upload an Image</label>
+          <input class="form-control" type="file" id="formFile">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Location</label>
+          <div class="row g-2">
+            <div class="col">
+              <input type="text" class="form-control" placeholder="Latitude">
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" placeholder="Longitude">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
