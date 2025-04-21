@@ -1,3 +1,6 @@
+
+    <?php require './Views/headers/admin_header.phtml'; ?>
+
 <?php
 require_once 'Models/Charger.php';
 
