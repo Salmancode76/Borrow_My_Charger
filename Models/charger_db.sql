@@ -40,7 +40,7 @@ CREATE TABLE `booking` (
 --
 -- Table structure for table `charge_point`
 --
-
+/*
 CREATE TABLE `charge_point` (
   `charger_id` int(11) NOT NULL,
   `charge_name` varchar(50) NOT NULL,
@@ -52,7 +52,25 @@ CREATE TABLE `charge_point` (
   `picture` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+--*/
+
+//new
+CREATE TABLE `charge_point` (
+  `charger_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `charge_name` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `cost` DECIMAL(8,2) NOT NULL,
+  `availability` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `latitude` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `longitude` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `user_id` INT(11) NOT NULL,
+  `picture` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `location` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `available_from` TIME DEFAULT NULL,
+  `available_to` TIME DEFAULT NULL,
+  PRIMARY KEY (`charger_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- Dumping data for table `charge_point`
 --
 
