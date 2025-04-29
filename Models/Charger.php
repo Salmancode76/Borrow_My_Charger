@@ -54,7 +54,7 @@ class Charger {
     }
 
 
-    }
+    
 
     
     //use user id 
@@ -87,7 +87,7 @@ public function updateCharger($param) {
                 `latitude` = :latitude,
                 `longitude` = :longitude,
                 `picture` = :picture,
-                `location` = :location,
+                `Location` = :Location,
                 `available_from` = :available_from,
                 `available_to` = :available_to
             WHERE `charger_id` = :charger_id
@@ -99,7 +99,7 @@ public function updateCharger($param) {
         $stmt->bindParam(':latitude', $param['latitude']);
         $stmt->bindParam(':longitude', $param['longitude']);
         $stmt->bindParam(':picture', $param['image']);
-        $stmt->bindParam(':location', $param['location']);
+        $stmt->bindParam(':Location', $param['Location']);
         $stmt->bindParam(':available_from', $param['available_from']);
         $stmt->bindParam(':available_to', $param['available_to']);
         $stmt->bindParam(':charger_id', $param['charger_id']);
@@ -119,9 +119,9 @@ public function updateCharger($param) {
     try {
         $stmt = $this->conn->prepare("
             INSERT INTO charge_point 
-            (charge_name, availability, cost, latitude, longitude, user_id, picture,location,available_from,available_to)
+            (charge_name, availability, cost, latitude, longitude, user_id, picture,Location,available_from,available_to)
             VALUES 
-            (:charge_name, :availability, :cost, :latitude, :longitude, :user_id, :picture, :location,:available_from,:available_to)
+            (:charge_name, :availability, :cost, :latitude, :longitude, :user_id, :picture, :Location,:available_from,:available_to)
         ");
 
         $charge_name = $param['name'];
@@ -142,7 +142,7 @@ public function updateCharger($param) {
         $stmt->bindParam(':longitude', $longitude);
         $stmt->bindParam(':user_id', $user_id); 
         $stmt->bindParam(':picture', $picture);
-        $stmt->bindParam(':location', $location);
+        $stmt->bindParam(':Location', $location);
         $stmt->bindParam(':available_from',$avaFrom);
         $stmt->bindParam(':available_to', $avaTo);
 

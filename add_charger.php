@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
         'latitude' => $latitude,
         'longitude' => $longitude,
         'image' => $imagePath,
-        'location'=>$location,
+        'Location'=>$location,
         '$avaFrom' => $avaFrom,
         '$avaTo'=> $avaTo
         ];

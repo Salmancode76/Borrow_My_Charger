@@ -1,4 +1,4 @@
-
+/*
 let markers = [];
 
 async function LoadMap() {
@@ -97,3 +97,6 @@ function getUserLocation() {
         }
     });
 }
+ * 
+ * *
+ */
