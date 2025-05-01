@@ -1,0 +1,155 @@
+<?php
+require_once '../Models/Charger.php';
+
+$charger = new Charger();
+$data = $charger->getAllChargers();
+
+?>
+
+<script>
+    const chargerData = <?php echo json_encode($data); ?>;
+    console.log("Chargers (from PHP):", chargerData);
+</script>
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+  </head>
+  <body>
+      
+      <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+    </style>
+    
+    
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid container">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Features</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Pricing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+    
+    
+    
+    <div class="container mb-2 mt-5">
+      <div class="d-flex justify-content-between mb-3">
+          <h3>Welcome User</h3>
+      </div>
+    </div>
+
+    <div class="container d-flex flex-column justify-content-center mb-5">
+                <div id="map"></div>
+
+      <button class="btn btn-primary mt-3 m-auto" data-bs-toggle="modal" data-bs-target="#exampleModal">Book Charge Point</button>
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Booking Details</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+              <label class="mb-1" for="date">Choose date</label>
+              <input id="date" class="form-control" type="date" />
+            </div>
+            <div class="mb-3">
+              <label class="mb-1" for="time">Choose time</label>
+              <select class="form-select" aria-label="Default select example">
+                <option selected>Select Time</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="container mb-3">
+      <h2>Booking Requests</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>John</td>
+            <td>Doe</td>
+          </tr>
+        </tbody>
+      
+      </table>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+      crossorigin="anonymous"
+    ></script>
+
+<script src="Map.js"></script>
+<script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCf6CIeUcXb6aIJNQO_Wg7idkbqbLRY63A&libraries=maps,marker&callback=LoadMap&loading=async" 
+    async 
+    defer>
+</script>
+  </body>
+</html>

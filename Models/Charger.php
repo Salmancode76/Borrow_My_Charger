@@ -53,7 +53,7 @@ class Charger {
         }
     }
 
-    //use user id 
+    // use user id 
     public function getChargerByChargerID($id) {
         try {
             $stmt = $this->conn->prepare("
