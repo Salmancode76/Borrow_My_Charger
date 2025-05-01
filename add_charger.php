@@ -1,10 +1,22 @@
 <?php
-
+session_start();
 require_once 'Models/Charger.php';
 
 $std = new stdClass();
 
 require './Views/add-charge.phtml';
+
+// Get the current user ID from session
+$customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+
+// If no user is logged in, return error
+if ($customer_id === 0) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'You must be logged in before you add a charge point'
+    ]);
+    exit;
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
     $charge_name = htmlentities(trim($_POST['charge_name'] ?? ''));

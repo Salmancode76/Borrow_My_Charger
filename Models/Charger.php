@@ -147,7 +147,7 @@ public function updateCharger($param) {
         $cost = $param['price'];
         $latitude = $param['latitude'];
         $longitude = $param['longitude'];
-        $user_id = 2; 
+        $user_id = $_SESSION['user_id']; 
         $picture = $param['image'];
         $location = $param['location'];
         $avaFrom = $param['$avaFrom'];
