@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Charge Point Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="Views/styles.css" />  
+  <style>
+      .navbar {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  color: black;
+}
+  body {
+      background-color: #f8f9fa;
+    }
+    .card-box {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+    }
+    .availability-status {
+      font-weight: bold;
+    }
+    .table thead {
+      background-color: #e9ecef;
+    }
+    .btn-dark {
+      border-radius: 6px;
+    }
+    .navbar .nav-link {
+      color: #212529 !important;
+    }
+    .navbar .nav-link:hover {
+      color: #0d6efd !important; 
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg shadow-sm" style="backdrop-filter: blur(8px); background-color: rgba(255, 255, 255, 0.75);">
+  <div class="container-fluid">
+    <a id="header_Home"class="navbar-brand fw-semibold text-dark" href="homeowner_dashboard.phtml">🏠 Homeowner Panel</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHomeowner" aria-controls="navbarHomeowner" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarHomeowner">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link text-dark" href="homeowner_dashboard.php">Dashboard</a>
+        </li>
+     
+      
+        <li class="nav-item">
+          <a class="nav-link text-danger fw-semibold" href="logout.phtml">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container py-5">
+  <!-- Header Section -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-semibold">Welcome, User</h3>
+    <a class="btn btn-dark" href="manage_charger.php">Manage Charge Point</a>
+  </div>
+  
+
+
+
+  <div class="row g-3 card-box mb-4">
+      
+            <div class="col-md-12 text-center">
+          <p class="mb-2 fw-bold text-muted"> 🔌 <?php echo $std->charge_name; ?></p>
+    <?php if (!empty($std->picture)) { ?>
+    
+      <div class="p-3 border rounded bg-white shadow-sm">
+        <img 
+          src="/Borrow_My_Charger/<?php echo htmlspecialchars($std->picture); ?>" 
+          alt="Charger Image"
+          class="img-fluid rounded"
+          style="max-height: 300px; object-fit: cover;">
+      </div>
+    <?php } else { ?>
+      <div class="p-3 border rounded bg-light text-muted">
+        No Image Uploaded
+      </div>
+    <?php } ?>
+</div>
+    <div class="col-md-4">
+      <p class="mb-1 fw-bold text-muted">📍 Location</p>
+      <p class="mb-0"><?php echo $std->location; ?></p>
+<small>
+    <?php echo "Latitude: " . $std->latitude . ", Longitude: " . $std->longitude; ?>
+</small>
+    </div>
+
+    <div class="col-md-4">
+      <p class="mb-1 fw-bold text-muted">💰 Price</p>
+      <p class="fs-5 fw-bold text-success mb-0"><?php echo $std->cost. "BD"; ?></p>
+      <small>Price per kWh</small>
+    </div>
+      
+ <div class="col-md-4">
+    <p class="mb-1 fw-bold text-muted">🔌 Availability Time</p>
+    <div class="p-2 bg-light border rounded text-center shadow-sm">
+      <span class="fw-semibold text-primary fs-5">
+        <?php echo date('H:i', strtotime($std->available_from)); ?>
+        -
+        <?php echo date('H:i', strtotime($std->available_to)); ?>
+      </span>
+      <br>
+      <small class="text-muted">(24h format)</small>
+    </div>
+  </div>
+</div>
+
+  <!--
+    <div class="col-md-4">
+        <label for="availability" class="form-label fw-bold text-muted">🔌 Availability</label>
+        <select class="form-select availability-status" id="availability">
+            <option selected disabled>Select Availability</option>
+            <option value="available">Available</option>
+            <option value="not_available">Not Available</option>
+        </select>
+        </div>
+    </div>
+  -->
+  <div class="card-box">
+    <h4 class="mb-4">📋 Booking Requests</h4>
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First</th>
+          <th scope="col">Last</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (isset($std->bookingRequests) && !empty($std->bookingRequests)): ?>
+          <?php foreach ($std->bookingRequests as $index => $request): ?>
+            <?php if (strtolower($request["status"]) === "pending"): ?>
+                <tr data-booking-id="<?php echo $request['booking_id']; ?>">
+                    <th scope="row"><?php echo $index + 1; ?></th>
+                    <td><?php echo $request["customer_first_name"] ?></td>
+                    <td><?php echo $request["customer_last_name"]?></td>
+                    <td>
+                      <button class="btn btn-sm btn-success me-1 approve" onclick="updateStatus(<?php echo $request['booking_id'] ?>,'approve')">Approve</button>
+                      <button class="btn btn-sm btn-danger reject" onclick="updateStatus(<?php echo $request['booking_id'] ?>,'reject')">Reject</button>
+                    </td>
+                </tr>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12 text-center text-muted">
+            <p>No Booking Requests have been placed at your charge point.</p>
+          </div>
+        <?php endif; ?>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="card-box mt-4">
+    <h4 class="mb-4">📋 Booking Requests History</h4>
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">First</th>
+                <th scope="col">Last</th>
+                <th scope="col">Date</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (isset($std->bookingRequests) && !empty($std->bookingRequests)): ?>
+                <?php 
+                $historyIndex = 1;
+                foreach ($std->bookingRequests as $request): ?>
+                    <?php if (strtolower($request["status"]) !== "pending"): ?>
+                        <tr data-booking-id="<?php echo $request['booking_id']; ?>" 
+                            class="<?php echo strtolower($request["status"]) === "approved" ? 'table-success' : 'table-danger'; ?>">
+                            <th scope="row"><?php echo $historyIndex++; ?></th>
+                            <td><?php echo $request["customer_first_name"] ?></td>
+                            <td><?php echo $request["customer_last_name"]?></td>
+                            <td><?php echo date('M d, Y', strtotime($request["date"])); ?></td>
+                            <td>
+                                <span class="badge <?php echo strtolower($request["status"]) === "approved" ? 'bg-success' : 'bg-danger'; ?>">
+                                    <?php echo $request["status"]; ?>
+                                </span>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                
+                <?php if (!array_filter($std->bookingRequests, function($req) { 
+                    return strtolower($req["status"]) !== "pending"; 
+                })): ?>
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            <p>No booking history available.</p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+                
+            <?php else: ?>
+                <div class="col-12 text-center text-muted">
+                    <p>No Booking Requests have been placed at your charge point.</p>
+                </div>
+            <?php endif; ?>
+        </tbody>
+    </table>
+  </div>
+</div>
+<script>
+function updateStatus(bookingId, status) {
+    const data = {
+        booking_id: bookingId,
+        status: status,
+        action: 'update_status'
+    };
+    
+    // Send AJAX request with JSON
+    fetch('homeowner_dashboard.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+        .then(data => {
+        if (data.success) {
+            // Update the UI
+            const row = document.querySelector(`tr[data-booking-id="${bookingId}"]`);
+            if (status === 'approve') {
+                row.classList.add('table-success');
+                row.querySelector('.approve').disabled = true;
+                row.querySelector('.reject').disabled = true;
+            } else if (status === 'reject') {
+                row.classList.add('table-danger');
+                row.querySelector('.approve').disabled = true;
+                row.querySelector('.reject').disabled = true;
+            }
+            
+            // Show success message
+            alert(`Booking ${status === 'approve' ? 'approved' : 'rejected'} successfully!`);
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update booking status. Please try again.');
+    });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Manage Users</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .card-box {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    .btn-action {
+      padding: 3px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="fw-semibold">🛠️ Admin Panel - Manage Users</h3>
+      <a href="admin_dashboard.phtml" class="btn btn-dark">← Back to Dashboard</a>
+    </div>
+
+    <!-- User List -->
+    <div class="card-box">
+      <h5 class="mb-3">👥 All Registered Users</h5>
+
+      <table class="table table-striped align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Example rows -->
+          <tr>
+            <td>1</td>
+            <td>Salman Hussain</td>
+            <td>salman@example.com</td>
+            <td>Homeowner</td>
+            <td><span class="badge bg-success">Active</span></td>
+            <td>
+              <a href="#" class="btn btn-sm btn-danger btn-action">Delete</a>
+              <a href="#" class="btn btn-sm btn-warning btn-action">Deactivate</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Alice Noor</td>
+            <td>alice@evmail.com</td>
+            <td>User</td>
+            <td><span class="badge bg-secondary">Deactivated</span></td>
+            <td>
+              <a href="#" class="btn btn-sm btn-danger btn-action">Delete</a>
+              <a href="#" class="btn btn-sm btn-success btn-action">Activate</a>
+            </td>
+          </tr>
+          <!-- Add PHP loop here in dynamic version -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

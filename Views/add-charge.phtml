@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><?php echo isset($std->charger_id) ? 'Edit' : 'Add'; ?> Charge Point</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    body { background-color: #f8f9fa; }
+    .card-box { background-color: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 30px; }
+    .form-label { font-weight: 500; }
+    .btn-primary { border-radius: 6px; }
+    .page-title { font-weight: 600; }
+  </style>
+</head>
+
+<?php require 'headers/home_owner_header.phtml'; ?>
+
+<body>
+<div class="container py-5">
+
+  <?php if (!empty($std->picture)) { ?>
+    <div class="text-center mb-4">
+      <img 
+        src="/Borrow_My_Charger/<?php echo htmlspecialchars($std->picture); ?>" 
+        alt="Charger Image" 
+        class="img-fluid rounded" 
+        style="max-height: 300px; object-fit: cover; margin-bottom: 10px;">
+      <div class="text-muted small">
+        <?php echo htmlspecialchars($std->picture); ?>
+      </div>
+    </div>
+  <?php } ?>
+
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="page-title"><?php echo isset($std->charger_id) ? '✏️ Edit' : '🔌 Add New'; ?> Charge Point</h3>
+    <a href="homeowner_dashboard.php" class="btn btn-dark">Back to Dashboard</a>
+  </div>
+
+  <div class="card-box">
+<form method="post" action="/Borrow_My_Charger/<?php echo isset($std->charger_id) ? 'manage_charger.php' : 'add_charger.php'; ?>" 
+      enctype="multipart/form-data">
+      
+      <?php if (isset($std->charger_id)) { ?>
+        <input type="hidden" name="charger_id" value="<?php echo $std->charger_id; ?>">
+      <?php } ?>
+
+      <div class="mb-3">
+        <label for="charge-point-name" class="form-label">Charge Point Name</label>
+        <input type="text" class="form-control" id="charge-point-name" name="charge_name" 
+        placeholder="e.g. Home Garage Charger"
+        value="<?php echo isset($std->charge_name) ? htmlspecialchars($std->charge_name) : ''; ?>">
+      </div>
+
+      <div class="mb-3">
+        <label for="charge-point-loca" class="form-label">Location</label>
+        <input type="text" class="form-control" id="charge-point-loca" name="charge_loca" 
+        placeholder="e.g. Manama"
+        value="<?php echo isset($std->location) ? htmlspecialchars($std->location) : ''; ?>">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Availability Time</label>
+        <div class="row g-2">
+          <div class="col">
+            <label for="available_from" class="form-label small">From</label>
+            <input type="time" class="form-control" id="available_from" name="available_from" 
+            value="<?php echo isset($std->available_from) ? htmlspecialchars($std->available_from) : ''; ?>" required>
+          </div>
+          <div class="col">
+            <label for="available_to" class="form-label small">To</label>
+            <input type="time" class="form-control" id="available_to" name="available_to" 
+            value="<?php echo isset($std->available_to) ? htmlspecialchars($std->available_to) : ''; ?>" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="priceperkwh" class="form-label">Price per kWh</label>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input name="priceperkwh" type="number" step="0.01" class="form-control" id="priceperkwh"
+          placeholder="0.20"
+          value="<?php echo isset($std->cost) ? htmlspecialchars($std->cost) : ''; ?>">
+          <span class="input-group-text">/kWh</span>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="formFile" class="form-label">Upload an Image</label>
+        <input class="form-control" name="charger_image" type="file" id="formFile">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Latitude / Longitude</label>
+        <div class="row g-2">
+          <div class="col">
+            <input type="number" name="latitude" class="form-control" placeholder="Latitude"
+            value="<?php echo isset($std->latitude) ? htmlspecialchars($std->latitude) : ''; ?>">
+          </div>
+          <div class="col">
+            <input type="number" name="longitude" class="form-control" placeholder="Longitude"
+            value="<?php echo isset($std->longitude) ? htmlspecialchars($std->longitude) : ''; ?>">
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">
+        <?php echo isset($std->charger_id) ? 'Update' : 'Submit'; ?>
+      </button>
+
+    </form>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

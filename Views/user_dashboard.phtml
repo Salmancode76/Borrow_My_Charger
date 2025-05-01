@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .card-box {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 30px;
+    }
+
+    .btn-dark {
+      border-radius: 6px;
+    }
+
+    .form-label {
+      font-weight: 500;
+    }
+
+    .table thead {
+      background-color: #e9ecef;
+      
+    }
+    #map {
+        height: 400px;
+        width: 100%;
+        border: 2px solid #4CAF50;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    @keyframes highlightRow {
+        0% { background-color: rgba(255, 255, 0, 0.3); }
+        100% { background-color: transparent; }
+    }
+  
+   .highlight-update {
+     animation: highlightRow 3s ease;
+    }
+  </style>
+</head>
+<body>
+    
+  <div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="fw-semibold">Welcome, EV Driver</h3>
+      <a href="user-search.php" class="btn btn-dark">🔍 Find a Charger</a>
+    </div>
+    
+    <!-- Booking History Table -->
+    <div class="card-box mb-4">
+      <h4 class="mb-4">📋 My Booking History</h4>
+      <table class="table table-striped align-middle" id="booking-history-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Charge Point</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (isset($std->bookingRequests) && !empty($std->bookingRequests)): ?>
+            <?php $counter = 1; ?>
+            <?php foreach ($std->bookingRequests as $booking): ?>
+              <tr data-booking-id="<?php echo $booking['booking_id']; ?>">
+                <th scope="row"><?php echo $counter++; ?></th>
+                <td><?php echo $booking['charge_name']; ?></td>
+                <td><?php echo date('Y-m-d', strtotime($booking['date'])); ?></td>
+                <td>
+                  <?php
+                    $statusClass = '';
+                    switch(strtolower($booking['status'])) {
+                      case 'pending':
+                        $statusClass = 'badge bg-warning text-dark';
+                        break;
+                      case 'approved':
+                        $statusClass = 'badge bg-success';
+                        break;
+                      case 'declined':
+                        $statusClass = 'badge bg-danger';
+                        break;
+                    }
+                  ?>
+                  <span class="<?php echo $statusClass; ?>" id="status-<?php echo $booking['booking_id']; ?>">
+                    <?php echo $booking['status']; ?>
+                  </span>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="4" class="text-center">No booking requests found.</td>
+            </tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    // Function to poll for booking status updates
+    function pollBookingUpdates() {
+      // Get the latest timestamp we checked (could be stored in localStorage)
+      const lastCheckTime = localStorage.getItem('lastStatusCheck') || '<?php echo date('Y-m-d H:i:s'); ?>';
+
+      fetch('user_dashboard.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          last_check_time: lastCheckTime
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Store the current time as our last check
+          localStorage.setItem('lastStatusCheck', data.current_time);
+
+          // Update the UI for any bookings with changed status
+          if (data.updates && data.updates.length > 0) {
+            data.updates.forEach(booking => {
+              const statusElement = document.getElementById(`status-${booking.booking_id}`);
+              if (statusElement) {
+                // Remove old status classes
+                statusElement.classList.remove('bg-warning', 'bg-success', 'bg-danger', 'text-dark');
+
+                // Add new status class and update text
+                switch(booking.status.toLowerCase()) {
+                  case 'pending':
+                    statusElement.classList.add('badge', 'bg-warning', 'text-dark');
+                    break;
+                  case 'approved':
+                    statusElement.classList.add('badge', 'bg-success');
+                    break;
+                  case 'declined':
+                    statusElement.classList.add('badge', 'bg-danger');
+                    break;
+                }
+
+                statusElement.textContent = booking.status;
+
+                // Optional: Highlight the row to indicate it changed
+                const row = document.querySelector(`tr[data-booking-id="${booking.booking_id}"]`);
+                if (row) {
+                  row.classList.add('highlight-update');
+                  setTimeout(() => {
+                    row.classList.remove('highlight-update');
+                  }, 3000);
+                }
+              }
+            });
+
+            // Optional: Show notification
+            if (data.updates.length > 0) {
+              const notification = document.createElement('div');
+              notification.className = 'alert alert-info alert-dismissible fade show';
+              notification.innerHTML = `
+                <strong>Update!</strong> ${data.updates.length} booking request(s) have been updated.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              `;
+              document.querySelector('.card-box').prepend(notification);
+            }
+          }
+        }
+      })
+      .catch(error => console.error('Error polling for updates:', error));
+    }
+    
+    // Start polling every 30 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initial poll
+        pollBookingUpdates();
+
+        // Set up polling interval
+        setInterval(pollBookingUpdates, 30000); // 30 seconds
+    });
+  </script>  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <div id="map"></div>
+    <script src="Map.js"></script>
+    <script 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCf6CIeUcXb6aIJNQO_Wg7idkbqbLRY63A&libraries=maps,marker&callback=LoadMap&loading=async" 
+        async 
+        defer>
+    </script>
+</body>
+</html>
