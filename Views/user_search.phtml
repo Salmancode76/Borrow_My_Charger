@@ -15,7 +15,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .form-label {
@@ -33,6 +33,12 @@
       padding: 15px;
       margin-bottom: 20px;
       height: 100%;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .charge-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .charge-img {
@@ -40,80 +46,240 @@
       height: 160px;
       object-fit: cover;
       border-radius: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     .card-content p {
-      margin-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .row.g-3 {
+      margin-bottom: 30px;
+    }
+    
+    #map {
+      height: 400px;
+      width: 100%;
+      border: 2px solid #4CAF50;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+    }
+    
+    .status-available {
+      color: #198754;
+      font-weight: 600;
+    }
+    
+    .status-unavailable {
+      color: #dc3545;
+      font-weight: 600;
+    }
+    
+    /* Loading spinner */
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+    
+    .loading-container {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-
   <div class="container py-5">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="fw-semibold">🔍 Find a Charge Point</h3>
+      <h3 class="fw-semibold">🔌 Find a Charge Point</h3>
       <a href="user_dashboard.phtml" class="btn btn-dark">← Back to Dashboard</a>
     </div>
 
-    <form method="GET" action="" class="card-box mb-4">
+    <!-- Search Form -->
+    <form id="search-form" class="card-box mb-4">
       <div class="row g-3">
         <div class="col-md-4">
           <label class="form-label">Location</label>
-          <input type="text" class="form-control" name="location" placeholder="e.g. Manama">
+          <input type="text" class="form-control" name="location" placeholder="e.g. Manama" id="location" onkeyup="searchChargePoints()">
         </div>
 
         <div class="col-md-4">
-          <label class="form-label">Max Price per kWh</label>
-          <input type="number" step="0.01" class="form-control" name="max_price" placeholder="e.g. 0.25">
+          <label class="form-label">Max Price per KWH</label>
+          <input type="number" step="0.01" class="form-control" name="max_price" placeholder="e.g. 0.25" id="max_price" onkeyup="searchChargePoints()">
         </div>
 
         <div class="col-md-4">
           <label class="form-label">Availability</label>
-          <select class="form-select" name="availability">
-            <option selected disabled>Choose...</option>
+          <select class="form-select" name="availability" id="availability" onchange="searchChargePoints()">
+            <option value="">All</option>
             <option value="available">Available</option>
             <option value="not_available">Not Available</option>
           </select>
         </div>
       </div>
-
-      <div class="mt-4 text-end">
-        <button class="btn btn-primary">Search</button>
-      </div>
     </form>
-
-    <div class="row">
-      <!-- Card 1 -->
-      <div class="col-md-6">
-        <div class="charge-card">
-          <img src="images/test.jpg" alt="Charge Point" class="charge-img">
-          <div class="card-content">
-            <h5 class="fw-bold">📍 5 The Crescent, Salford</h5>
-            <p>💵 <strong>£0.25</strong> per kWh</p>
-            <p>🔋 <span class="badge bg-success">Available</span></p>
-            <p class="text-muted">Lat: 53.483710, Lng: -2.270110</p>
-            <a href="booking_form.phtml?cp_id=1" class="btn btn-sm btn-outline-primary w-100">Request Booking</a>
-          </div>
-        </div>
+    
+    <!-- Loading spinner -->
+    <div class="loading-container" id="loading">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
+    </div>
 
-      <div class="col-md-6">
-        <div class="charge-card">
-          <img src="images/test.jpg" alt="Charge Point" class="charge-img">
-          <div class="card-content">
-            <h5 class="fw-bold">📍 Manama, Road 535</h5>
-            <p>💵 <strong>£0.30</strong> per kWh</p>
-            <p>🔋 <span class="badge bg-danger">Not Available</span></p>
-            <p class="text-muted">Lat: 26.2285, Lng: 50.5861</p>
-            <a href="#" class="btn btn-sm btn-outline-secondary w-100 disabled">Not Available</a>
+    <!-- Map Section -->
+    <div id="map" class="mb-4"></div>
+    
+    <!-- Results Section -->
+    <h4 class="mb-3">Available Charge Points</h4>
+    <div class="row" id="results">
+      <!-- Filtered charge points will be displayed here -->
+      <?php if (isset($chargers) && !empty($chargers)): ?>
+        <?php foreach ($chargers as $point): ?>
+          <div class="col-md-4 mb-4">
+            <div class="charge-card">
+              <div class="card-content">
+                <p><strong>Location:</strong> <?= htmlspecialchars($point['Location'] ?? 'Unknown Location') ?></p>
+                <p><strong>Price:</strong> <?= htmlspecialchars($point['cost'] ?? 'N/A') ?> BHD</p>
+                <p><strong>Status:</strong> 
+                  <span class="<?= ($point['availability'] === 'Available') ? 'status-available' : 'status-unavailable' ?>">
+                    <?= htmlspecialchars($point['availability'] ?? 'Unknown Status') ?>
+                  </span>
+                </p>
+                <button class="btn btn-dark mt-2 w-100" onclick="bookCharger(<?= $point['charger_id'] ?>)">Book Now</button>
+              </div>
+            </div>
           </div>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div class="col-12 text-center text-muted">
+          <p>Use the filters above to find charge points.</p>
         </div>
-      </div>
+      <?php endif; ?>
     </div>
   </div>
 
+  <script>
+let map;
+let markers = [];
+
+async function LoadMap() {
+    let center = await getUserLocation();
+
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 10,
+        center: center || { lat: 26.0667, lng: 50.5577 }, // Bahrain fallback
+    });
+
+    searchChargePoints();  // Load initial chargers
+    setInterval(searchChargePoints, 30000);  // Refresh every 30 seconds
+}
+
+function searchChargePoints() {
+    const location = document.getElementById('location').value;
+    const maxPrice = document.getElementById('max_price').value;
+    const availability = document.getElementById('availability').value;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", `user-search.php?location=${encodeURIComponent(location)}&max_price=${encodeURIComponent(maxPrice)}&availability=${encodeURIComponent(availability)}`, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            try {
+                const chargers = JSON.parse(xhr.responseText);
+                updateResultsList(chargers);
+                updateMapMarkers(chargers);
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+            }
+        }
+    };
+    xhr.send();
+}
+
+function updateResultsList(chargers) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    if (chargers.length === 0) {
+        resultsDiv.innerHTML = '<div class="col-12 text-center"><p>No matching chargers found.</p></div>';
+        return;
+    }
+
+    chargers.forEach(point => {
+        var statusClass = point.availability === 'Available' ? 'status-available' : 'status-unavailable';
+        var chargerCard = `
+            <div class="col-md-4 mb-4">
+                <div class="charge-card">
+                    <div class="card-content">
+                        <p><strong>Location:</strong> ${point.Location || 'Unknown'}</p>
+                        <p><strong>Price:</strong> ${point.cost || 'N/A'} BHD</p>
+                        <p><strong>Status:</strong> <span class="${statusClass}">${point.availability || 'Unknown'}</span></p>
+                        <button class="btn btn-dark mt-2 w-100" onclick="bookCharger(${point.charger_id})">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        resultsDiv.innerHTML += chargerCard;
+    });
+}
+
+function updateMapMarkers(chargers) {
+    // Clear old markers
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+
+    chargers.forEach(charger => {
+        if (!charger.latitude || !charger.longitude) return;
+
+        const marker = new google.maps.Marker({
+            map: map,
+            position: { lat: parseFloat(charger.latitude), lng: parseFloat(charger.longitude) },
+            title: charger.Location || "Charge Point"
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: `<strong>${charger.Location || 'Unknown'}</strong><br>Price: ${charger.cost || 'N/A'} BHD`
+        });
+
+        marker.addListener('click', () => {
+            infoWindow.open(map, marker);
+        });
+
+        markers.push(marker);
+    });
+}
+
+function bookCharger(chargerId) {
+    console.log(`Booking charger ${chargerId}`);
+    window.location.href = `booking.php?charger_id=${chargerId}`;
+}
+
+function getUserLocation() {
+    return new Promise((resolve) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => resolve({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                }),
+                error => {
+                    console.warn("Location not available:", error.message);
+                    resolve(null);
+                }
+            );
+        } else {
+            resolve(null);
+        }
+    });
+}
+
+  </script>
+  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCf6CIeUcXb6aIJNQO_Wg7idkbqbLRY63A&libraries=maps,marker&callback=LoadMap&loading=async" async defer></script>
 </body>
 </html>

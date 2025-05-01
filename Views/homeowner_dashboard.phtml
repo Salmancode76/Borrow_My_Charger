@@ -52,7 +52,7 @@
     <div class="collapse navbar-collapse" id="navbarHomeowner">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link text-dark" href="homeowner_dashboard.phtml">Dashboard</a>
+          <a class="nav-link text-dark" href="homeowner_dashboard.php">Dashboard</a>
         </li>
      
       
@@ -68,22 +68,62 @@
   <!-- Header Section -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="fw-semibold">Welcome, User</h3>
-    <a class="btn btn-dark" href="add-Charge.phtml">Manage Charge Point</a>
+    <a class="btn btn-dark" href="manage_charger.php">Manage Charge Point</a>
   </div>
+  
+
+
 
   <div class="row g-3 card-box mb-4">
+      
+            <div class="col-md-12 text-center">
+          <p class="mb-2 fw-bold text-muted"> 🔌 <?php echo $std->charge_name; ?></p>
+    <?php if (!empty($std->picture)) { ?>
+    
+      <div class="p-3 border rounded bg-white shadow-sm">
+        <img 
+          src="/Borrow_My_Charger/<?php echo htmlspecialchars($std->picture); ?>" 
+          alt="Charger Image"
+          class="img-fluid rounded"
+          style="max-height: 300px; object-fit: cover;">
+      </div>
+    <?php } else { ?>
+      <div class="p-3 border rounded bg-light text-muted">
+        No Image Uploaded
+      </div>
+    <?php } ?>
+</div>
     <div class="col-md-4">
       <p class="mb-1 fw-bold text-muted">📍 Location</p>
-      <p class="mb-0">Manama</p>
-      <small>Road 535, Building 2052</small>
+      <p class="mb-0"><?php echo $std->location; ?></p>
+<small>
+    <?php echo "Latitude: " . $std->latitude . ", Longitude: " . $std->longitude; ?>
+</small>
     </div>
 
     <div class="col-md-4">
       <p class="mb-1 fw-bold text-muted">💰 Price</p>
-      <p class="fs-5 fw-bold text-success mb-0">$325</p>
-      <small>per hour</small>
+      <p class="fs-5 fw-bold text-success mb-0"><?php echo $std->cost. "BD"; ?></p>
+      <small>Price per kWh</small>
     </div>
+      
+ <div class="col-md-4">
+    <p class="mb-1 fw-bold text-muted">🔌 Availability Time</p>
+    <div class="p-2 bg-light border rounded text-center shadow-sm">
+      <span class="fw-semibold text-primary fs-5">
+        <?php echo date('H:i', strtotime($std->available_from)); ?>
+        -
+        <?php echo date('H:i', strtotime($std->available_to)); ?>
+      </span>
+      <br>
+      <small class="text-muted">(24h format)</small>
+    </div>
+  </div>
+</div>
 
+
+
+      <!--
     <div class="col-md-4">
       <label for="availability" class="form-label fw-bold text-muted">🔌 Availability</label>
       <select class="form-select availability-status" id="availability">
@@ -93,6 +133,8 @@
       </select>
     </div>
   </div>
+      
+      -->
 
   <div class="card-box">
     <h4 class="mb-4">📋 Booking Requests</h4>

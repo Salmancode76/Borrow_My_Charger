@@ -3,18 +3,25 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/register_controller.php</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/manage_users_controller.php</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/Views/admin_dashboard.phtml</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/Views/register.phtml</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/Views/admin_manage_chargepoints.phtml</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/index.php</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/Models/User.php</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/Views/admin_manage_users.php</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/Models/connectionDB.php</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/Views/login.phtml</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/logout.php</file>
-            <file>file:/C:/xampp/htdocs/Borrow_My_Charger-main/Borrow_My_Charger-main/login_controller.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/register_controller.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/manage_users_controller.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/admin_dashboard.phtml</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/register.phtml</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/admin_manage_chargepoints.phtml</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/index.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Models/User.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/admin_manage_users.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/login.phtml</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/logout.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/login_controller.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Models/connectionDB.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/user-search.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/admin_manage_users.phtml</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/user_search.phtml</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/homeowner_dashboard.php</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Views/add-charge.phtml</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Models/charger_db.sql</file>
+            <file>file:/C:/xampp/htdocs/Borrow_My_Charger/Models/Charger.php</file>
         </group>
     </open-files>
 </project-private>
