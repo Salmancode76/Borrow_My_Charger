@@ -1,9 +1,19 @@
 <?php
+session_start();
 date_default_timezone_set('Asia/Bahrain');
 require_once './Models/Booking.php';
 
 $std = new stdClass();
 $booking = new Booking();
+
+// Get the current user ID from session
+$customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+
+// If no user is logged in, return error
+if ($customer_id === 0) {
+    header("Location: login.php");
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the raw POST data
@@ -14,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Get any booking status updates since the last check time
-        $updates = $booking->getBookingStatusUpdates(6, $last_check_time);
+        $updates = $booking->getBookingStatusUpdates($customer_id, $last_check_time);
 
         // Return the updates and current time
         echo json_encode([
@@ -32,6 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;    
 }    
 
-$std->bookingRequests = $booking->getBookingsByCustomer(6);
+$std->bookingRequests = $booking->getBookingsByCustomer($customer_id);
 
 require_once './Views/user_dashboard.phtml';

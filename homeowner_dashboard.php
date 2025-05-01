@@ -1,10 +1,20 @@
 <?php
+session_start();
 require_once './Models/Charger.php';
 require_once './Models/Booking.php';
 
 $std = new stdClass();
 $charger = new Charger();
 $booking = new Booking();
+
+// Get the current user ID from session
+$homeowner_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+
+// If no user is logged in, return error
+if ($homeowner_id === 0) {
+    header("Location: login.php");
+    exit;
+}
 
 // AJAX request handler for booking status updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -54,9 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
-$result =  $charger->getChargerByID(2);
-$bookingRequests = $booking->getBookingsByChargerOwner(2);
+$result =  $charger->getChargerByID($homeowner_id);
+$bookingRequests = $booking->getBookingsByChargerOwner($homeowner_id);
 
 $std->charger_id = $result['charger_id'];
 $std->charge_name = $result['charge_name'];

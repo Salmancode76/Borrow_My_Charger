@@ -43,9 +43,9 @@ class User {
     }
 
     public function login($email, $password) {
-        $stmt = $this->conn->prepare("SELECT u.*, r.role_name FROM user u JOIN role r ON u.role_id = r.role_id WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT u.*, r.role_name FROM user u JOIN role r ON u.role_id = r.role_id WHERE u.email = ?");
         $stmt->execute([$email]);
-        $user = $stmt->fetch();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
             return [
@@ -54,6 +54,7 @@ class User {
                 'name' => $user['first_name'] . ' ' . $user['last_name']
             ];
         }
+        
         return ['error' => 'Invalid email or password.'];
     }
 

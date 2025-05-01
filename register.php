@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1. Check if passwords match
     if ($password !== $confirm) {
-        header("Location: Views/register.phtml?error=" . urlencode("Passwords do not match"));
+        header("Location: register.php?error=" . urlencode("Passwords do not match"));
         exit;
     }
 
@@ -42,41 +42,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         !preg_match('/[0-9]/', $password) ||
         !preg_match('/[\W]/', $password)
     ) {
-        header("Location: Views/register.phtml?error=" . urlencode("Password must be 8+ chars, include uppercase, number & special char"));
+        header("Location: register.php?error=" . urlencode("Password must be 8+ chars, include uppercase, number & special char"));
         exit;
     }
 
     // 3. Email must be valid & @gmail.com
     if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !str_ends_with($email, '@gmail.com')) {
-        header("Location: Views/register.phtml?error=" . urlencode("Only valid Gmail addresses allowed"));
+        header("Location: register.php?error=" . urlencode("Only valid Gmail addresses allowed"));
         exit;
     }
 
     // 4. Check if email exists
     if ($userModel->emailExists($email)) {
-        header("Location: Views/register.phtml?error=" . urlencode("Email already registered"));
+        header("Location: register.php?error=" . urlencode("Email already registered"));
         exit;
     }
 
     // 5. Check if username already exists
     if ($userModel->usernameExists($name)) {
-        header("Location: Views/register.phtml?error=" . urlencode("Username already taken"));
+        header("Location: register.php?error=" . urlencode("Username already taken"));
         exit;
     }
 
     // 6. Check if username + password hash combo already exists
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     if ($userModel->isDuplicateUsernamePassword($name, $hashedPassword)) {
-        header("Location: Views/register.phtml?error=" . urlencode("Username and password already used."));
+        header("Location: register.php?error=" . urlencode("Username and password already used."));
         exit;
     }
 
     // 7. Register user
     if ($userModel->register($name, $email, $password, $roleId)) {
-        header("Location: Views/login.phtml?success=" . urlencode("Registration successful"));
+        header("Location: login.php?success=" . urlencode("Registration successful"));
         exit;
     } else {
-        header("Location: Views/register.phtml?error=" . urlencode("Registration failed"));
+        header("Location: register.php?error=" . urlencode("Registration failed"));
         exit;
     }
 }
+
+require_once './Views/register.phtml';

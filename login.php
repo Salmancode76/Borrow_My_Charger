@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($result['error'])) {
         // Redirect back to the login page with error
-        header("Location: Views/login.phtml?error=" . urlencode($result['error']));
+        header("Location: login.php?error=" . urlencode($result['error']));
         exit;
     }
 
@@ -27,15 +27,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Redirect based on role
     switch (strtolower($result['role'])) {
         case 'admin':
-            header("Location: Views/admin_dashboard.phtml");
+            header("Location: admin_dashboard.php");
             break;
         case 'rental manager':
-            header("Location: Views/homeowner_dashboard.phtml");
+            header("Location: homeowner_dashboard.php");
             break;
         case 'customer':
         default:
-            header("Location: Views/user_dashboard.phtml");
+            header("Location: user_dashboard.php");
             break;
     }
     exit;
 }
+
+require_once './Views/login.phtml';

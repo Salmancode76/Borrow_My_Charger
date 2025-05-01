@@ -7,7 +7,7 @@ require_once 'Models/Booking.php';
 header('Content-Type: application/json');
 
 // Get the current user ID from session
-$customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 6;
+$customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
 // If no user is logged in, return error
 if ($customer_id === 0) {
