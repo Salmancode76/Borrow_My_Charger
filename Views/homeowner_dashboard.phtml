@@ -42,32 +42,8 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg shadow-sm" style="backdrop-filter: blur(8px); background-color: rgba(255, 255, 255, 0.75);">
-  <div class="container-fluid">
-    <a id="header_Home"class="navbar-brand fw-semibold text-dark" href="homeowner_dashboard.phtml">🏠 Homeowner Panel</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHomeowner" aria-controls="navbarHomeowner" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse" id="navbarHomeowner">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link text-dark" href="homeowner_dashboard.php">Dashboard</a>
-        </li>
-     
-      
-        <li class="nav-item">
-          <a class="nav-link text-danger fw-semibold" href="logout.phtml">Logout</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 3634e7185890aa80b655a19fd5388190bb7aef5a
 <div class="container py-5">
   <!-- Header Section -->
   <div class="d-flex justify-content-between align-items-center mb-4">
@@ -99,7 +75,7 @@
 </div>
     <div class="col-md-4">
       <p class="mb-1 fw-bold text-muted">📍 Location</p>
-      <p class="mb-0"><?php echo $std->location; ?></p>
+      <p class="mb-0"><?php echo $std->Location; ?></p>
 <small>
     <?php echo "Latitude: " . $std->latitude . ", Longitude: " . $std->longitude; ?>
 </small>

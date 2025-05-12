@@ -1,13 +1,12 @@
 <?php
 session_start();
 
-// Clear all session variables
 session_unset();
 
-// Destroy the session
 session_destroy();
+$_SESSION['user_id'] = null;
+$_SESSION['user_role'] = null;
 
-// Redirect to login page
 header("Location: login.php");
 exit;
 ?>

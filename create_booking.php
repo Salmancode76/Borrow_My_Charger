@@ -9,15 +9,10 @@ header('Content-Type: application/json');
 // Get the current user ID from session
 $customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
-// If no user is logged in, return error
 if ($customer_id === 0) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'You must be logged in to book a charging session'
-    ]);
+    header("Location: /Borrow_My_Charger/login.php");
     exit;
 }
-
 // Get the request body
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);

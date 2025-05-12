@@ -1,12 +1,17 @@
 <?php
 
 require_once 'Models/Charger.php';
-
+session_start();
 $std = new stdClass();
 
 $charger = new Charger();
+$homeowner_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
-$result =  $charger->getChargerByID(2);
+if ($homeowner_id === 0) {
+    header("Location: /Borrow_My_Charger/login.php");
+    exit;
+}
+$result =  $charger->getChargerByID($homeowner_id);
 
 $std->charger_id = $result['charger_id'];
 $std->charge_name = $result['charge_name'];
@@ -16,8 +21,8 @@ $std->latitude = $result['latitude'];
 $std->longitude = $result['longitude'];
 $std->user_id = $result['user_id'];
 $std->picture = $result['picture'];
-$std->location = $result['location'];
-$std->available_from = $result['available_from'];
+    $std->Location = ($result['Location']);
+    $std->available_from = $result['available_from'];
 $std->available_to = $result['available_to'];
 
 
@@ -32,15 +37,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
 
     $imagePath = $std->picture;
 
-    if (isset($_FILES['charger_image']) && isset($_POST['picture']) ) {
+ if (isset($_FILES['charger_image']) && $_FILES['charger_image']['size'] > 0) {
         $imageTmp = $_FILES['charger_image']['tmp_name'];
-        $imageName = basename($_FILES['charger_image']['name']);
+        $imageName = time() . '_' . basename($_FILES['charger_image']['name']);
+        
+        // FIXED: Correct directory path syntax
         $uploadDir = __DIR__ . '/images/';
+        
+        // Create directory if it doesn't exist
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
+        
         $imagePath = 'images/' . $imageName;
-        move_uploaded_file($imageTmp, $uploadDir . $imageName);
+        
+        // Try to upload and provide error details if it fails
+        if (!move_uploaded_file($imageTmp, $uploadDir . $imageName)) {
+            echo "<div class='alert alert-danger mt-3'>Failed to upload image. Error code: " . 
+                 $_FILES['charger_image']['error'] . "</div>";
+        }
     }
 
     $params = [
@@ -51,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
         'latitude' => $latitude,
         'longitude' => $longitude,
         'image' => $imagePath,
-        'location' => $location,
+        'Location' => $location,
         'available_from' => $avaFrom,
         'available_to' => $avaTo
     ];
@@ -64,5 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
         echo "<div class='alert alert-danger mt-3'>❌ Failed to update charger.</div>";
     }
 }
+require './Views/headers/home_owner_header.phtml'; 
 
 require './Views/add-charge.phtml';

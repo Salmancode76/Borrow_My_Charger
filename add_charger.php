@@ -3,20 +3,16 @@ session_start();
 require_once 'Models/Charger.php';
 
 $std = new stdClass();
-
 require './Views/add-charge.phtml';
 
 // Get the current user ID from session
 $customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
-
 // If no user is logged in, return error
 if ($customer_id === 0) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'You must be logged in before you add a charge point'
-    ]);
+    header("Location: /Borrow_My_Charger/login.php");
     exit;
 }
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
     $charge_name = htmlentities(trim($_POST['charge_name'] ?? ''));
@@ -55,6 +51,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
     $charger = new Charger();
     if ($charger->insert_charger($params)) {
         echo "<div class='alert alert-success mt-3'>✅ Charger successfully added!</div>";
+                    header("Location: homeowner_dashboard.php");
+
     } else {
         echo "<div class='alert alert-danger mt-3'>❌ Failed to add charger.</div>";
     }

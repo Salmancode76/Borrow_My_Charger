@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 date_default_timezone_set('Asia/Bahrain');
 require_once './Models/Booking.php';
@@ -9,9 +10,8 @@ $booking = new Booking();
 // Get the current user ID from session
 $customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
-// If no user is logged in, return error
 if ($customer_id === 0) {
-    header("Location: login.php");
+    header("Location: /Borrow_My_Charger/login.php");
     exit;
 }
 
@@ -43,5 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }    
 
 $std->bookingRequests = $booking->getBookingsByCustomer($customer_id);
+    require_once './Views/headers/users_header.phtml';
 
 require_once './Views/user_dashboard.phtml';

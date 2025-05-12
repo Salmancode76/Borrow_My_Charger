@@ -42,21 +42,28 @@ class User {
         return $stmt->execute([$name, $email, $hashedPassword, $roleId]);
     }
 
-    public function login($email, $password) {
-        $stmt = $this->conn->prepare("SELECT u.*, r.role_name FROM user u JOIN role r ON u.role_id = r.role_id WHERE u.email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+  public function login($email, $password) {
+    $stmt = $this->conn->prepare("SELECT u.*, r.role_name FROM user u JOIN role r ON u.role_id = r.role_id WHERE u.email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password'])) {
-            return [
-                'id' => $user['user_id'],
-                'role' => $user['role_name'],
-                'name' => $user['first_name'] . ' ' . $user['last_name']
-            ];
-        }
-        
+    if (!$user) {
+        error_log("No user found for email: $email");
         return ['error' => 'Invalid email or password.'];
     }
+
+    if (!password_verify($password, $user['password'])) {
+        error_log("Wrong password for: $email");
+        return ['error' => 'Invalid email or password.'];
+    }
+
+    return [
+        'id' => $user['user_id'],
+        'role' => $user['role_name'],
+        'name' => $user['first_name'] . ' ' . $user['last_name']
+    ];
+}
+
 
     public function getAllUsers() {
         $stmt = $this->conn->query("SELECT u.*, r.role_name FROM user u JOIN role r ON u.role_id = r.role_id");

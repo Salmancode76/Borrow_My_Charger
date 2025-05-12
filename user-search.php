@@ -1,5 +1,14 @@
 <?php
 require_once 'Models/Charger.php';
+session_start();
+
+$customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+
+if ($customer_id === 0) {
+    header("Location: /Borrow_My_Charger/login.php");
+    exit;
+}
+
 
 // Get and sanitize parameters
 $max_price = isset($_GET['max_price']) ? $_GET['max_price'] : '';
@@ -26,7 +35,7 @@ if (!empty($matchedChargers)) {
             'Location' => isset($point['Location']) ? $point['Location'] : 'Unknown Location',
             'cost' => isset($point['cost']) ? $point['cost'] : 'N/A',
             'availability' => isset($point['availability']) ? $point['availability'] : 'Unknown Status',
-            'image_url' => isset($point['image_url']) ? $point['image_url'] : 'default_image.jpg',
+'image_url' => isset($point['picture']) ? $point['picture'] : 'images/default_image.jpg',     
             'latitude' => isset($point['latitude']) ? $point['latitude'] : null,
             'longitude' => isset($point['longitude']) ? $point['longitude'] : null
         ];
@@ -39,7 +48,7 @@ if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQ
     exit;
 } else {
     $chargers = $response;
-    
+    require_once './Views/headers/users_header.phtml';
     require_once './Views/user_search.phtml';
 }
 ?>

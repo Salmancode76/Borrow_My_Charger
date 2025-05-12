@@ -97,7 +97,6 @@
       <h3 class="fw-semibold">🔌 Find a Charge Point</h3>
       <a href="user_dashboard.php" class="btn btn-dark">← Back to Dashboard</a>
     </div>
-
     <!-- Search Form -->
     <form id="search-form" class="card-box mb-4">
       <div class="row g-3">
@@ -141,7 +140,7 @@
           <div class="col-md-4 mb-4">
             <div class="charge-card">
               <div class="card-content">
-                <p><strong>Location:</strong> <?= htmlspecialchars($point['Location'] ?? 'Unknown Location') ?></p>
+<img src="/Borrow_My_Charger/images/<?php echo $point['image_url']; ?>" alt="Charging Point" class="charge-img"/>                <p><strong>Location:</strong> <?= htmlspecialchars($point['Location'] ?? 'Unknown Location') ?></p>
                 <p><strong>Price:</strong> <?= htmlspecialchars($point['cost'] ?? 'N/A') ?> BHD</p>
                 <p><strong>Status:</strong> 
                   <span class="<?= ($point['availability'] === 'Available') ? 'status-available' : 'status-unavailable' ?>">
@@ -256,6 +255,7 @@ function updateResultsList(chargers) {
             <div class="col-md-4 mb-4">
                 <div class="charge-card">
                     <div class="card-content">
+                        <img src="/Borrow_My_Charger/${point.image_url}" alt="Charging Point" class="charge-img"/>
                         <p><strong>Location:</strong> ${point.Location || 'Unknown'}</p>
                         <p><strong>Price:</strong> ${point.cost || 'N/A'} BHD</p>
                         <p><strong>Status:</strong> <span class="${statusClass}">${point.availability || 'Unknown'}</span></p>

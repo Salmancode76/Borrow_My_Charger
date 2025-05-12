@@ -10,9 +10,10 @@ $booking = new Booking();
 // Get the current user ID from session
 $homeowner_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
+
 // If no user is logged in, return error
 if ($homeowner_id === 0) {
-    header("Location: login.php");
+    header("Location: /Borrow_My_Charger/login.php");
     exit;
 }
 
@@ -75,11 +76,12 @@ $std->latitude = $result['latitude'];
 $std->longitude = $result['longitude'];
 $std->user_id = $result['user_id'];
 $std->picture = $result['picture'];
-$std->location = $result['location'];
+$std->Location = $result['Location'];
 $std->available_from = $result['available_from'];
 $std->available_to = $result['available_to'];
 $std->bookingRequests = $bookingRequests;
 
+require './Views/headers/home_owner_header.phtml'; 
 require './Views/homeowner_dashboard.phtml';
 
 

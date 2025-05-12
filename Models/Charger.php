@@ -149,7 +149,7 @@ public function updateCharger($param) {
         $longitude = $param['longitude'];
         $user_id = $_SESSION['user_id']; 
         $picture = $param['image'];
-        $location = $param['location'];
+        $location = $param['Location'];
         $avaFrom = $param['$avaFrom'];
         $avaTo = $param['$avaTo'];
 
