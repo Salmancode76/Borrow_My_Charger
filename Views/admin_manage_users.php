@@ -1,5 +1,7 @@
 <?php
 session_start();
+require './headers/admin_header.phtml'; 
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.phtml');
     exit;
@@ -42,7 +44,7 @@ $i = 1;
   <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="fw-semibold">🛠️ Admin Panel - Manage Users</h3>
-      <a href="admin_dashboard.phtml" class="btn btn-dark">← Back to Dashboard</a>
+      <a href="/Borrow_My_Charger/admin_dashboard.php" class="btn btn-dark">← Back to Dashboard</a>
     </div>
 
     <div class="card-box">

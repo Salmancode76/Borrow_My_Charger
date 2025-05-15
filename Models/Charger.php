@@ -170,5 +170,33 @@ public function updateCharger($param) {
     }
 }
 
+public function deleteCharger($id) {
+  try {
+        // Begin transaction to ensure both operations succeed or fail together
+        $this->conn->beginTransaction();
+        
+        // First, delete all bookings associated with this charger
+        $stmtBookings = $this->conn->prepare("DELETE FROM `booking` WHERE `charge_id` = :charger_id");
+        $stmtBookings->bindParam(':charger_id', $id, PDO::PARAM_INT);
+        $stmtBookings->execute();
+        
+        // Then delete the charger itself
+        $stmtCharger = $this->conn->prepare("DELETE FROM `charge_point` WHERE `charger_id` = :charger_id");
+        $stmtCharger->bindParam(':charger_id', $id, PDO::PARAM_INT);
+        $stmtCharger->execute();
+        
+        $this->conn->commit();
+        return true;
+        
+    } catch (PDOException $e) {
+        if ($this->conn->inTransaction()) {
+            $this->conn->rollBack();
+        }
+        error_log("Delete charger failed: " . $e->getMessage());
+        throw $e; // Re-throw the exception to be caught by the calling code
+    }
+    
+}
+
 }
 ?>

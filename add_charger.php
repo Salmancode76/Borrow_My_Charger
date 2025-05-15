@@ -3,9 +3,28 @@ session_start();
 require_once 'Models/Charger.php';
 
 $std = new stdClass();
+$is_admin = ($_SESSION['user_role'] === "admin");
+if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+    // Get the user role and convert to lowercase for case-insensitive comparison
+    $user_role = strtolower($_SESSION['user_role']);
+    
+    // Check if user is admin
+    if ($user_role === "admin") {
+        require './Views/headers/admin_header.phtml';
+    } else {
+        // For any non-admin role, show the homeowner header
+        require './Views/headers/home_owner_header.phtml';
+    }
+} else {
+    // User is not logged in, redirect to login page
+    header("Location: /Borrow_My_Charger/login.php");
+    exit;
+}
+
 require './Views/add-charge.phtml';
 
-// Get the current user ID from session
+
+
 $customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 // If no user is logged in, return error
 if ($customer_id === 0) {

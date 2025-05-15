@@ -2,22 +2,17 @@
 session_start();
 require_once './Models/Charger.php';
 require_once './Models/Booking.php';
-
 $std = new stdClass();
 $charger = new Charger();
 $booking = new Booking();
 
-// Get the current user ID from session
 $homeowner_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
-
-// If no user is logged in, return error
 if ($homeowner_id === 0) {
     header("Location: /Borrow_My_Charger/login.php");
     exit;
 }
 
-// AJAX request handler for booking status updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the raw POST data
     $json = file_get_contents('php://input');
@@ -65,9 +60,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$result =  $charger->getChargerByID($homeowner_id);
-$bookingRequests = $booking->getBookingsByChargerOwner($homeowner_id);
+// Get the homeowner's charger
+$result = $charger->getChargerByID($homeowner_id);
 
+// Check if the homeowner has a charger
+if ($result === false) {
+    // No charger found - redirect to add charger page
+    header("Location: /Borrow_My_Charger/add_charger.php");
+    exit;
+}
+
+// If we get here, the homeowner has a charger, so continue with the dashboard
+$bookingRequests = $booking->getBookingsByChargerOwner($homeowner_id);
 $std->charger_id = $result['charger_id'];
 $std->charge_name = $result['charge_name'];
 $std->cost = $result['cost'];
@@ -83,8 +87,4 @@ $std->bookingRequests = $bookingRequests;
 
 require './Views/headers/home_owner_header.phtml'; 
 require './Views/homeowner_dashboard.phtml';
-
-
-
-
-
+?>
