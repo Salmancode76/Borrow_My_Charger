@@ -4,6 +4,11 @@ require_once 'Models/Charger.php';
 $std = new stdClass();
 $is_admin = ($_SESSION['user_role'] === "admin");
 
+if($_SESSION['user_role'] === "Customer"){
+     header("Location: /Borrow_My_Charger/login.php");
+    exit;
+}
+
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role'])) {
     header("Location: /Borrow_My_Charger/login.php");
     exit;

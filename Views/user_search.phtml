@@ -88,6 +88,45 @@
       align-items: center;
       margin-bottom: 20px;
     }
+
+    /* Pagination styles */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .page-link {
+      color: #212529;
+      background-color: #fff;
+      border: 1px solid #dee2e6;
+      padding: 0.5rem 0.75rem;
+      margin: 0 3px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .page-link:hover {
+      z-index: 2;
+      color: #0a58ca;
+      background-color: #e9ecef;
+      border-color: #dee2e6;
+    }
+    
+    .page-item.active .page-link {
+      z-index: 3;
+      color: #fff;
+      background-color: #212529;
+      border-color: #212529;
+    }
+    
+    .page-item.disabled .page-link {
+      color: #6c757d;
+      pointer-events: none;
+      background-color: #fff;
+      border-color: #dee2e6;
+    }
   </style>
 </head>
 <body>
@@ -132,7 +171,19 @@
     <div id="map" class="mb-4"></div>
     
     <!-- Results Section -->
-    <h4 class="mb-3">Available Charge Points</h4>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>Available Charge Points</h4>
+      <div>
+        <select class="form-select form-select-sm" id="items-per-page" style="width: auto;" onchange="changeItemsPerPage()">
+          <option value="3">3 per page</option>
+          <option value="6" selected>6 per page</option>
+          <option value="9">9 per page</option>
+          <option value="12">12 per page</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Results container -->
     <div class="row" id="results">
       <!-- Filtered charge points will be displayed here -->
       <?php if (isset($chargers) && !empty($chargers)): ?>
@@ -140,7 +191,8 @@
           <div class="col-md-4 mb-4">
             <div class="charge-card">
               <div class="card-content">
-<img src="/Borrow_My_Charger/images/<?php echo $point['image_url']; ?>" alt="Charging Point" class="charge-img"/>                <p><strong>Location:</strong> <?= htmlspecialchars($point['Location'] ?? 'Unknown Location') ?></p>
+                <img src="/Borrow_My_Charger/images/<?php echo $point['image_url']; ?>" alt="Charging Point" class="charge-img"/>
+                <p><strong>Location:</strong> <?= htmlspecialchars($point['Location'] ?? 'Unknown Location') ?></p>
                 <p><strong>Price:</strong> <?= htmlspecialchars($point['cost'] ?? 'N/A') ?> BHD</p>
                 <p><strong>Status:</strong> 
                   <span class="<?= ($point['availability'] === 'Available') ? 'status-available' : 'status-unavailable' ?>">
@@ -159,7 +211,19 @@
       <?php endif; ?>
     </div>
     
-    <!-- First, let's add a modal to your page (put this at the bottom of your body) -->
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div class="text-muted" id="page-info">
+        Showing <span id="showing-start">0</span> to <span id="showing-end">0</span> of <span id="total-items">0</span> charge points
+      </div>
+      <nav aria-label="Charge points pagination">
+        <ul class="pagination" id="pagination">
+          <!-- Pagination links will be added by JavaScript -->
+        </ul>
+      </nav>
+    </div>
+    
+    <!-- Booking Modal -->
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -204,6 +268,9 @@
   <script>
 let map;
 let markers = [];
+let currentPage = 1;
+let itemsPerPage = 6; // Default: 6 items per page
+let allChargers = []; // Store all chargers for pagination
 
 async function LoadMap() {
     let center = await getUserLocation();
@@ -221,17 +288,24 @@ function searchChargePoints() {
     const location = document.getElementById('location').value;
     const maxPrice = document.getElementById('max_price').value;
     const availability = document.getElementById('availability').value;
+    
+    // Show loading spinner
+    document.getElementById('loading').style.display = 'flex';
 
     const xhr = new XMLHttpRequest();
     xhr.open("GET", `user-search.php?location=${encodeURIComponent(location)}&max_price=${encodeURIComponent(maxPrice)}&availability=${encodeURIComponent(availability)}`, true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
     xhr.onload = function() {
+        // Hide loading spinner
+        document.getElementById('loading').style.display = 'none';
+        
         if (xhr.status === 200) {
             try {
-                const chargers = JSON.parse(xhr.responseText);
-                updateResultsList(chargers);
-                updateMapMarkers(chargers);
+                allChargers = JSON.parse(xhr.responseText);
+                currentPage = 1; // Reset to first page on new search
+                renderCurrentPage();
+                updateMapMarkers(allChargers); // Show all markers on map
             } catch (error) {
                 console.error("Error parsing JSON:", error);
             }
@@ -240,14 +314,29 @@ function searchChargePoints() {
     xhr.send();
 }
 
+function renderCurrentPage() {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, allChargers.length);
+    const currentPageData = allChargers.slice(startIndex, endIndex);
+    
+    updateResultsList(currentPageData);
+    updatePagination();
+}
+
 function updateResultsList(chargers) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
 
     if (chargers.length === 0) {
         resultsDiv.innerHTML = '<div class="col-12 text-center"><p>No matching chargers found.</p></div>';
+        
+        document.getElementById('pagination').style.display = 'none';
+        document.getElementById('page-info').style.display = 'none';
         return;
     }
+
+    document.getElementById('pagination').style.display = 'flex';
+    document.getElementById('page-info').style.display = 'block';
 
     chargers.forEach(point => {
         var statusClass = point.availability === 'Available' ? 'status-available' : 'status-unavailable';
@@ -268,8 +357,103 @@ function updateResultsList(chargers) {
     });
 }
 
+function updatePagination() {
+    const paginationElement = document.getElementById('pagination');
+    const totalPages = Math.ceil(allChargers.length / itemsPerPage);
+    
+    const startItem = allChargers.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+    const endItem = Math.min(currentPage * itemsPerPage, allChargers.length);
+    document.getElementById('showing-start').textContent = startItem;
+    document.getElementById('showing-end').textContent = endItem;
+    document.getElementById('total-items').textContent = allChargers.length;
+    
+    let paginationHTML = '';
+    
+    paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="goToPage(${currentPage - 1}); return false;">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+    `;
+    
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    // Adjust start page if we're near the end
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    if (startPage > 1) {
+        paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(1); return false;">1</a>
+            </li>
+        `;
+        if (startPage > 2) {
+            paginationHTML += `
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+            `;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>
+            </li>
+        `;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+            `;
+        }
+        paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(${totalPages}); return false;">${totalPages}</a>
+            </li>
+        `;
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="goToPage(${currentPage + 1}); return false;">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    `;
+    
+    paginationElement.innerHTML = paginationHTML;
+}
+
+function goToPage(page) {
+    if (page < 1 || page > Math.ceil(allChargers.length / itemsPerPage) || page === currentPage) {
+        return; 
+    }
+    
+    currentPage = page;
+    renderCurrentPage();
+    window.scrollTo(0, document.getElementById('results').offsetTop - 20);
+    return false;
+}
+
+function changeItemsPerPage() {
+    itemsPerPage = parseInt(document.getElementById('items-per-page').value);
+    currentPage = 1; 
+    renderCurrentPage();
+}
+
 function updateMapMarkers(chargers) {
-    // Clear old markers
     markers.forEach(marker => marker.setMap(null));
     markers = [];
 
@@ -295,20 +479,16 @@ function updateMapMarkers(chargers) {
 }
 
 function bookCharger(chargerId) {
-  // Reset modal state
   document.getElementById('booking-error').classList.add('d-none');
   document.getElementById('booking-success').classList.add('d-none');
   document.getElementById('bookingForm').reset();
   
-  // Set charger ID in the form
   document.getElementById('charger_id').value = chargerId;
   
-  // Fetch charger details for display in the modal
   fetch(`get_charger_details.php?id=${chargerId}`)
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        // Display charger details
         const details = `
           <h6>Charging Point Details:</h6>
           <p><strong>Name:</strong> ${data.charger.charge_name}</p>
@@ -332,7 +512,6 @@ function bookCharger(chargerId) {
       console.error('Error fetching charger details:', error);
     });
   
-  // Show the modal
   const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
   bookingModal.show();
 }
@@ -356,12 +535,10 @@ function getUserLocation() {
     });
 }
 
-// Set up the event listener for the booking submission
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('submit-booking').addEventListener('click', function() {
     const form = document.getElementById('bookingForm');
     
-    // Basic form validation
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
@@ -374,7 +551,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create the booking datetime string
     const bookingDateTime = `${bookingDate} ${bookingTime}:00`;
     
-    // Send booking request
     fetch('create_booking.php', {
       method: 'POST',
       headers: {
@@ -392,18 +568,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('booking-success').classList.remove('d-none');
         document.getElementById('booking-error').classList.add('d-none');
         
-        // Disable the form
         const formElements = form.elements;
         for (let i = 0; i < formElements.length; i++) {
           formElements[i].disabled = true;
         }
         document.getElementById('submit-booking').disabled = true;
         
-        // Close modal after delay
         setTimeout(() => {
           bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
-          // Optionally refresh the page to show the new booking
-          // window.location.reload();
+          searchChargePoints();
         }, 3000);
       } else {
         // Show error message
@@ -420,7 +593,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-
   </script>
   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
