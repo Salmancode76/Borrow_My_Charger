@@ -86,6 +86,7 @@
         <label for="formFile" class="form-label">Upload an Image</label>
         <input class="form-control" name="charger_image" type="file" id="formFile">
       </div>
+        
 
       <div class="mb-3">
         <label class="form-label">Latitude / Longitude</label>
@@ -100,6 +101,13 @@
           </div>
         </div>
       </div>
+<div class="mb-3">
+  <label for="availability" class="form-label">Availability Status</label>
+<select name="availability" id="availability" class="form-select" required>
+    <option value="available" <?php echo (isset($std->availability) && $std->availability == 'available') ? 'selected' : ''; ?>>Available</option>
+    <option value="not_available" <?php echo (isset($std->availability) && $std->availability == 'not_available') ? 'selected' : ''; ?>>Not Available</option>
+</select>
+</div>
 
       <button type="submit" class="btn btn-primary w-100">
         <?php echo isset($std->charger_id) ? 'Update' : 'Submit'; ?>

@@ -76,6 +76,16 @@
       color: #6c757d;
       margin-top: 5px;
     }
+    .page-item.active .page-link {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .page-link {
+      color: #28a745;
+    }
+    .page-link:hover {
+      color: #218838;
+    }
   </style>
 </head>
 <body>
@@ -96,8 +106,6 @@
     <div class="alert alert-danger mb-4">An error occurred. Please try again.</div>
     <?php endif; ?>
     
-   
-    
     <div class="table-responsive">
       <table class="table table-hover align-middle">
         <thead class="table-light">
@@ -112,54 +120,123 @@
           </tr>
         </thead>
         <tbody>
-          <?php foreach($std->Chargers as $charger): ?>
+          <?php if (isset($std->Chargers) && !empty($std->Chargers)): ?>
+            <?php foreach($std->Chargers as $charger): ?>
+              <tr>
+                <td>
+                  <?php if(!empty($charger['picture'])): ?>
+                    <img src="<?php echo htmlspecialchars($charger['picture']); ?>" class="charger-image" alt="Charger Image">
+                  <?php else: ?>
+                    <div class="empty-image">
+                      <i class="fas fa-bolt text-secondary"></i>
+                    </div>
+                  <?php endif; ?>
+                </td>
+                <td>#CP<?php echo sprintf('%03d', $charger['charger_id']); ?></td>
+                <td class="charger-name"><?php echo htmlspecialchars($charger['charge_name']); ?></td>
+                <td class="location-text">
+                  <?php 
+                    echo !empty($charger['Location']) ? htmlspecialchars($charger['Location']) : 'Not specified'; 
+                    echo !empty($charger['latitude']) && !empty($charger['longitude']) ? 
+                      '<br><small class="text-muted">Lat: ' . $charger['latitude'] . ', Lng: ' . $charger['longitude'] . '</small>' : '';
+                  ?>
+                </td>
+                <td class="cost-value">$<?php echo number_format((float)$charger['cost'], 2); ?></td>
+             
+                <td>
+                  <?php if(!empty($charger['available_from']) && !empty($charger['available_to'])): ?>
+                    <div class="time-info">
+                      <i class="far fa-clock me-1"></i> <?php echo $charger['available_from']; ?> - <?php echo $charger['available_to']; ?>
+                    </div>
+                  <?php else: ?>
+                    <div class="time-info">No schedule set</div>
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <a href="admin_edit_chargers.php?id=<?php echo $charger['charger_id']; ?>" class="btn btn-primary btn-sm">
+                    <i class="fas fa-edit me-1"></i> Edit
+                  </a>
+                  <a href="admin_delete_charger.php?id=<?php echo $charger['charger_id']; ?>" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash me-1"></i> Delete
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
             <tr>
-              <td>
-                <?php if(!empty($charger['picture'])): ?>
-                  <img src="<?php echo htmlspecialchars($charger['picture']); ?>" class="charger-image" alt="Charger Image">
-                <?php else: ?>
-                  <div class="empty-image">
-                    <i class="fas fa-bolt text-secondary"></i>
-                  </div>
-                <?php endif; ?>
-              </td>
-              <td>#CP<?php echo sprintf('%03d', $charger['charger_id']); ?></td>
-              <td class="charger-name"><?php echo htmlspecialchars($charger['charge_name']); ?></td>
-              <td class="location-text">
-                <?php 
-                  echo !empty($charger['Location']) ? htmlspecialchars($charger['Location']) : 'Not specified'; 
-                  echo !empty($charger['latitude']) && !empty($charger['longitude']) ? 
-                    '<br><small class="text-muted">Lat: ' . $charger['latitude'] . ', Lng: ' . $charger['longitude'] . '</small>' : '';
-                ?>
-              </td>
-              <td class="cost-value">$<?php echo number_format((float)$charger['cost'], 2); ?></td>
-           
-              <td>
-                <?php if(!empty($charger['available_from']) && !empty($charger['available_to'])): ?>
-                  <div class="time-info">
-                    <i class="far fa-clock me-1"></i> <?php echo $charger['available_from']; ?> - <?php echo $charger['available_to']; ?>
-                  </div>
-                <?php else: ?>
-                  <div class="time-info">No schedule set</div>
-                <?php endif; ?>
-              </td>
-              <td>
-                <a href="admin_edit_chargers.php?id=<?php echo $charger['charger_id']; ?>" class="btn btn-primary btn-sm">
-                  <i class="fas fa-edit me-1"></i> Edit
-                </a>
-                             <a href="admin_delete_charger.php?id=<?php echo $charger['charger_id']; ?>" class="btn btn-danger btn-sm">
-  <i class="fas fa-trash me-1"></i> Delete
-</a>
+              <td colspan="7" class="text-center py-4">
+                <div class="text-muted">
+                  <i class="fas fa-info-circle me-2"></i> No charge points found
+                </div>
               </td>
             </tr>
-          <?php endforeach; ?>
+          <?php endif; ?>
         </tbody>
       </table>
     </div>
     
+    <?php if (isset($std->paginationData) && isset($std->paginationData['pagination']) && $std->paginationData['pagination']['totalPages'] > 1): ?>
+      <nav aria-label="Charge points pagination">
+        <ul class="pagination">
+          <!-- Previous Page Button -->
+          <li class="page-item <?php echo ($std->paginationData['pagination']['currentPage'] <= 1) ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $std->paginationData['pagination']['currentPage'] - 1; ?>" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          
+          <?php
+          // Determine range of page numbers to display
+          $rangeStart = max(1, $std->paginationData['pagination']['currentPage'] - 2);
+          $rangeEnd = min($std->paginationData['pagination']['totalPages'], $std->paginationData['pagination']['currentPage'] + 2);
+          
+          if($rangeStart > 1): ?>
+            <li class="page-item">
+              <a class="page-link" href="?page=1">1</a>
+            </li>
+            <?php if($rangeStart > 2): ?>
+              <li class="page-item disabled">
+                <span class="page-link">...</span>
+              </li>
+            <?php endif;
+          endif;
+          
+          // Display page numbers
+          for($i = $rangeStart; $i <= $rangeEnd; $i++): ?>
+            <li class="page-item <?php echo ($i == $std->paginationData['pagination']['currentPage']) ? 'active' : ''; ?>">
+              <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+            </li>
+          <?php endfor;
+          
+          if($rangeEnd < $std->paginationData['pagination']['totalPages']): 
+            if($rangeEnd < $std->paginationData['pagination']['totalPages'] - 1): ?>
+              <li class="page-item disabled">
+                <span class="page-link">...</span>
+              </li>
+            <?php endif; ?>
+            <li class="page-item">
+              <a class="page-link" href="?page=<?php echo $std->paginationData['pagination']['totalPages']; ?>"><?php echo $std->paginationData['pagination']['totalPages']; ?></a>
+            </li>
+          <?php endif; ?>
+          
+          <li class="page-item <?php echo ($std->paginationData['pagination']['currentPage'] >= $std->paginationData['pagination']['totalPages']) ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $std->paginationData['pagination']['currentPage'] + 1; ?>" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    <?php endif; ?>
+    
     <div class="d-flex justify-content-between align-items-center mt-4">
       <div class="text-muted">
-        <small>Showing all <?php echo count($std->Chargers); ?> charge points</small>
+        <small>
+          <?php if (isset($std->paginationData) && isset($std->paginationData['pagination']['totalItems'])): ?>
+            Showing <?php echo count($std->Chargers); ?> of <?php echo $std->paginationData['pagination']['totalItems']; ?> charge points
+          <?php else: ?>
+            Showing all <?php echo count($std->Chargers); ?> charge points
+          <?php endif; ?>
+        </small>
       </div>
       <div>
         <button class="btn btn-outline-secondary btn-sm" onclick="window.location.reload()">

@@ -43,8 +43,14 @@ class User {
     }
 
   public function login($email, $password) {
-    $stmt = $this->conn->prepare("SELECT u.*, r.role_name FROM user u JOIN role r ON u.role_id = r.role_id WHERE u.email = ?");
-    $stmt->execute([$email]);
+  $stmt = $this->conn->prepare("
+        SELECT u.*, r.role_name, s.status_name 
+        FROM user u 
+        JOIN role r ON u.role_id = r.role_id 
+        JOIN 	user_status s ON u.status_id = s.status_id
+        WHERE u.email = ?
+    ");   
+  $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
@@ -56,6 +62,14 @@ class User {
         error_log("Wrong password for: $email");
         return ['error' => 'Invalid email or password.'];
     }
+    
+     if ($user['status_id'] != 1) {
+        error_log("Account inactive for: $email");
+        return ['error' => 'Your account is not active. Please contact support.'];
+    }
+    
+    
+    
 
     return [
         'id' => $user['user_id'],

@@ -24,7 +24,7 @@ class Charger {
         }
     }
     
-     public function searchChargers($max_price = '' , $location = '') {
+public function searchChargers($min_price = '',$max_price = '' , $location = '' , $availability = '' ,$search_time) {
         try {
             $sql = "SELECT * FROM charge_point WHERE 1=1";  // Base query
             
@@ -34,11 +34,26 @@ class Charger {
             $sql .= " AND Location LIKE :location";
             $params[':location'] = $location . '%'; 
         }
+        if ($min_price !== '') {
+        $sql .= " AND cost >= :min_price";
+        $params[':min_price'] = (float)$min_price;
+    }
+
 
             if (!empty($max_price)) {
                 $sql .= " AND cost <= :max_price";  
                 $params[':max_price'] = $max_price;  
             }
+            
+            if (!empty($availability)) {
+                $sql .= " AND availability = :availability";  
+                $params[':availability'] = $availability;  
+            }
+               if (!empty($search_time)) {
+        $sql .= " AND :search_time BETWEEN available_from AND available_to";
+        $params[':search_time'] = $search_time;
+    }
+
             $stmt = $this->conn->prepare($sql);
 
             foreach ($params as $key => $value) {
@@ -196,6 +211,88 @@ public function deleteCharger($id) {
         throw $e; // Re-throw the exception to be caught by the calling code
     }
     
+}
+public function getUserChargersPaginated($userId, $page = 1, $itemsPerPage = 6) {
+    try {
+        // Ensure page is at least 1
+        $page = max(1, (int)$page);
+        
+        // Calculate offset
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // 1. Get total count for this user
+        $countStmt = $this->conn->prepare("SELECT COUNT(*) FROM charge_point WHERE user_id = :user_id");
+        $countStmt->bindParam(':user_id', $userId);
+        $countStmt->execute();
+        $totalItems = $countStmt->fetchColumn();
+        
+        $totalPages = ceil($totalItems / $itemsPerPage);
+        
+        // 3. Get chargers for current page
+        $stmt = $this->conn->prepare("
+            SELECT * FROM charge_point
+            WHERE user_id = :user_id
+            ORDER BY charger_id DESC
+            LIMIT :limit OFFSET :offset
+        ");
+        
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->bindParam(':limit', $itemsPerPage, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $chargers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return [
+            'chargers' => $chargers,
+            'pagination' => [
+                'currentPage' => $page,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalItems,
+                'itemsPerPage' => $itemsPerPage
+            ]
+        ];
+    } catch (PDOException $e) {
+        die("User chargers pagination query failed: " . $e->getMessage());
+    }
+}
+
+
+public function getChargersPaginated($page = 1, $itemsPerPage = 6) {
+    try {
+        $page = max(1, (int)$page);
+        
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        $countStmt = $this->conn->query("SELECT COUNT(*) FROM charge_point");
+        $totalItems = $countStmt->fetchColumn();
+        
+        $totalPages = ceil($totalItems / $itemsPerPage);
+        
+        $stmt = $this->conn->prepare("
+            SELECT * FROM charge_point 
+            ORDER BY charger_id DESC
+            LIMIT :limit OFFSET :offset
+        ");
+        
+        $stmt->bindParam(':limit', $itemsPerPage, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $chargers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return [
+            'chargers' => $chargers,
+            'pagination' => [
+                'currentPage' => $page,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalItems,
+                'itemsPerPage' => $itemsPerPage
+            ]
+        ];
+    } catch (PDOException $e) {
+        die("Pagination query failed: " . $e->getMessage());
+    }
 }
 
 }

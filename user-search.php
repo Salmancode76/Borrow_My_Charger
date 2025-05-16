@@ -14,17 +14,25 @@ if ($customer_id === 0) {
 $max_price = isset($_GET['max_price']) ? $_GET['max_price'] : '';
 $max_price = filter_var($max_price, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 
+$min_price = isset($_GET['min_price']) ? $_GET['min_price'] : '';
+$min_price = filter_var($min_price, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+
+
 $location = isset($_GET['location']) ? trim($_GET['location']) : '';
 $location = filter_var($location, FILTER_SANITIZE_STRING);
 
 $availability = isset($_GET['availability']) ? trim($_GET['availability']) : '';
 $availability = filter_var($availability, FILTER_SANITIZE_STRING);
 
+$search_time = isset($_GET['search_time']) ? $_GET['search_time'] : '';
+if ($search_time !== '' && strlen($search_time) === 5) {
+    $search_time .= ':00';
+}
 // Initialize charger model
 $chargerModel = new Charger();
 
 // Search chargers based on filters
-$matchedChargers = $chargerModel->searchChargers($max_price, $location, $availability);
+$matchedChargers = $chargerModel->searchChargers($min_price,$max_price, $location, $availability,$search_time);
 
 // Format response
 $response = [];
@@ -35,9 +43,11 @@ if (!empty($matchedChargers)) {
             'Location' => isset($point['Location']) ? $point['Location'] : 'Unknown Location',
             'cost' => isset($point['cost']) ? $point['cost'] : 'N/A',
             'availability' => isset($point['availability']) ? $point['availability'] : 'Unknown Status',
-'image_url' => isset($point['picture']) ? $point['picture'] : 'images/default_image.jpg',     
+            'image_url' => isset($point['picture']) ? $point['picture'] : 'images/default_image.jpg',     
             'latitude' => isset($point['latitude']) ? $point['latitude'] : null,
-            'longitude' => isset($point['longitude']) ? $point['longitude'] : null
+            'longitude' => isset($point['longitude']) ? $point['longitude'] : null,
+            'available_from' => $point['available_from'] ?? '00:00',
+            'available_to' => $point['available_to'] ?? '23:59'
         ];
     }
 }

@@ -110,6 +110,13 @@
           </div>
         </div>
       </div>
+      <div class="mb-3">
+  <label for="availability" class="form-label">Availability Status</label>
+<select name="availability" id="availability" class="form-select" required>
+    <option value="available" <?php echo (isset($std->availability) && $std->availability == 'available') ? 'selected' : ''; ?>>Available</option>
+    <option value="not_available" <?php echo (isset($std->availability) && $std->availability == 'not_available') ? 'selected' : ''; ?>>Not Available</option>
+</select>
+</div>
 
       <div class="d-grid gap-2">
         <button type="submit" class="btn btn-primary">Update Charger</button>

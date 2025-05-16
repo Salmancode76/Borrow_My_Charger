@@ -29,6 +29,8 @@ $std->available_to = $result['available_to'];
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
     $charge_name = htmlentities(trim($_POST['charge_name'] ?? ''));
     $priceperkwh = htmlentities(trim($_POST['priceperkwh'] ?? ''));
+        $availability = htmlentities(trim($_POST['availability']));
+
     $latitude = htmlentities(trim($_POST['latitude'] ?? ''));
     $longitude = htmlentities(trim($_POST['longitude'] ?? ''));
     $location = htmlentities(trim($_POST['charge_loca'] ?? ''));
@@ -62,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['charge_name'])) {
         'charger_id' => $std->charger_id,
         'name' => $charge_name,
         'price' => $priceperkwh,
-        'availability' => $std->availability ?? '',
+        'availability' => $availability,
         'latitude' => $latitude,
         'longitude' => $longitude,
         'image' => $imagePath,
