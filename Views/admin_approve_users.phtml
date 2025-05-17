@@ -9,7 +9,6 @@
     body {
       background-color: #f8f9fa;
     }
-
     .container-box {
       background-color: #fff;
       border-radius: 12px;
@@ -17,9 +16,12 @@
       padding: 30px;
       margin-top: 40px;
     }
-
     .btn-approve {
       min-width: 100px;
+    }
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s;
     }
   </style>
 </head>
@@ -27,8 +29,13 @@
 
   <div class="container">
     <div class="container-box">
-      <h3 class="mb-4">📝 Approve Registered Users</h3>
-
+      <div class="d-flex justify-content-between align-items-center mb-4">  
+        <h3 class="mb-4">📝 Approve Registered Users</h3>
+        <a href="admin_dashboard.php" class="btn btn-dark">← Back to Dashboard</a>
+      </div>
+      <!-- Alert for messages -->
+      <div id="approval-message" class="alert d-none mb-4"></div>
+      
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
@@ -38,39 +45,92 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Alice Johnson</td>
-            <td>alice@example.com</td>
-            <td>2025-04-15</td>
-            <td>
-              <button class="btn btn-success btn-sm btn-approve">✅ Approve</button>
-              <button class="btn btn-danger btn-sm btn-approve">❌ Reject</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Bob Smith</td>
-            <td>bob@example.com</td>
-            <td>2025-04-16</td>
-            <td>
-              <button class="btn btn-success btn-sm btn-approve">✅ Approve</button>
-              <button class="btn btn-danger btn-sm btn-approve">❌ Reject</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Charlie Daniels</td>
-            <td>charlie@example.com</td>
-            <td>2025-04-17</td>
-            <td>
-              <button class="btn btn-success btn-sm btn-approve">✅ Approve</button>
-              <button class="btn btn-danger btn-sm btn-approve">❌ Reject</button>
-            </td>
-          </tr>
+        <tbody id="pending-users-table">
+          <?php if (isset($pendingUsers) && !empty($pendingUsers)): ?>
+            <?php foreach ($pendingUsers as $user): ?>
+              <tr data-user-id="<?php echo $user['user_id']; ?>">
+                <td><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></td>
+                <td><?php echo htmlspecialchars($user['email']); ?></td>
+                <td><?php echo isset($user['created_at']) ? date('Y-m-d', strtotime($user['created_at'])) : 'N/A'; ?></td>
+                <td>
+                    <button class="btn btn-success btn-sm btn-approve" onclick="updateUserStatus(<?php echo $user['user_id']; ?>, 'approve')">✅ Approve</button>
+                    <button class="btn btn-danger btn-sm btn-approve" onclick="updateUserStatus(<?php echo $user['user_id']; ?>, 'disapprove')">❌ Reject</button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="4" class="text-center">No pending users to approve.</td>
+            </tr>
+          <?php endif; ?>
         </tbody>
       </table>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  
+   <script>
+    function updateUserStatus(userId, action) {
+      // Display loading state
+      const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+      const buttons = row.querySelectorAll('button');
+      buttons.forEach(btn => btn.disabled = true);
+
+      fetch('update_user_status.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          action: action
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          const messageDiv = document.getElementById('approval-message');
+          messageDiv.textContent = data.message;
+          messageDiv.classList.remove('d-none', 'alert-danger');
+          messageDiv.classList.add('alert-success');
+
+          // Remove the row with animation
+          row.classList.add('fade-out');
+          setTimeout(() => {
+            row.remove();
+
+            // Check if table is now empty
+            if (document.querySelectorAll('#pending-users-table tr').length === 0) {
+              const emptyRow = document.createElement('tr');
+              emptyRow.innerHTML = '<td colspan="4" class="text-center">No pending users to approve.</td>';
+              document.getElementById('pending-users-table').appendChild(emptyRow);
+            }
+          }, 500);
+        } else {
+          // Show error message
+          const messageDiv = document.getElementById('approval-message');
+          messageDiv.textContent = data.message || 'An error occurred';
+          messageDiv.classList.remove('d-none', 'alert-success');
+          messageDiv.classList.add('alert-danger');
+
+          // Re-enable buttons
+          buttons.forEach(btn => btn.disabled = false);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Show error message
+        const messageDiv = document.getElementById('approval-message');
+        messageDiv.textContent = 'Network error occurred';
+        messageDiv.classList.remove('d-none', 'alert-success');
+        messageDiv.classList.add('alert-danger');
+
+        // Re-enable buttons
+        buttons.forEach(btn => btn.disabled = false);
+      });
+    }
+  </script>
 </body>
 </html>

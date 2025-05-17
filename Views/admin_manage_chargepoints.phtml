@@ -89,13 +89,16 @@
   </style>
 </head>
 <body>
-<div class="container">
+<div class="container pt-4">
+  <div class="d-flex justify-content-end align-items-center mb-4">  
+    <a href="admin_dashboard.php" class="btn btn-dark">← Back to Dashboard</a>
+  </div>
   <div class="container-box">
     <div class="header-section">
       <h3 class="mb-0">⚡ Manage Charge Points</h3>
-<a href="/Borrow_My_Charger/add_charger.php" class="btn btn-success">
-  <i class="fas fa-plus me-2"></i>Add New Charger
-</a>
+      <a href="/Borrow_My_Charger/add_charger.php" class="btn btn-success">
+        <i class="fas fa-plus me-2"></i>Add New Charger
+      </a>
     </div>
     
     <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>

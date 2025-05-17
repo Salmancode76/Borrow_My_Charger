@@ -124,8 +124,11 @@ CREATE TABLE `user_status` (
 --
 
 INSERT INTO `user_status` (`status_id`, `status_name`) VALUES
-(1, 'Active'),
-(2, 'Active');
+(1, 'Pending'),
+(2, 'Approved'),
+(3, 'Disapproved'),
+(4, 'Activated'),
+(5, 'Deactivated');
 
 --
 -- Indexes for dumped tables
@@ -229,6 +232,10 @@ ALTER TABLE booking
 ADD COLUMN last_updated TIMESTAMP 
 DEFAULT CURRENT_TIMESTAMP 
 ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE `user` 
+ADD COLUMN created_at TIMESTAMP 
+DEFAULT CURRENT_TIMESTAMP 
 
 ALTER TABLE user MODIFY password VARCHAR(255);
 
