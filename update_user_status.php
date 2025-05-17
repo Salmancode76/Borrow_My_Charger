@@ -33,7 +33,7 @@ $action = $data['action'];
 
 // Map action to status
 $statusMap = [
-    'approve' => 'Active',
+    'approve' => 'Approved',
     'disapprove' => 'Disapproved'
 ];
 

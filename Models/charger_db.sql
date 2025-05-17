@@ -127,7 +127,7 @@ INSERT INTO `user_status` (`status_id`, `status_name`) VALUES
 (1, 'Pending'),
 (2, 'Approved'),
 (3, 'Disapproved'),
-(4, 'Activated'),
+(4, 'Active'),
 (5, 'Deactivated');
 
 --

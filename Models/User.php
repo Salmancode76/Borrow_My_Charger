@@ -49,9 +49,9 @@ class User {
 
     public function register($name, $email, $password, $roleId) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO user (first_name, last_name, email, password, role_id, status_id) VALUES (?, '', ?, ?, ?, 1)";
+        $sql = "INSERT INTO user (first_name, last_name, email, password, role_id, status_id) VALUES (?, '', ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        return $stmt->execute([$name, $email, $hashedPassword, $roleId]);
+        return $stmt->execute([$name, $email, $hashedPassword, $roleId, $roleId === 2 ? 1 : 4]);
     }
 
   public function login($email, $password) {
@@ -85,7 +85,12 @@ class User {
 
 
     public function getAllUsers() {
-        $stmt = $this->conn->query("SELECT u.*, r.role_name FROM user u JOIN role r ON u.role_id = r.role_id");
+        $stmt = $this->conn->query("
+            SELECT u.*, s.status_name, r.role_name 
+            FROM user u 
+            JOIN role r ON u.role_id = r.role_id 
+            JOIN user_status s ON s.status_id = u.status_id
+        ");
         return $stmt->fetchAll();
     }
     

@@ -16,40 +16,24 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
     
     $_SESSION['user_status'] = $status_name;
     
-    if ($status_name !== 'pending' && $status_name !== 'deactivated' && $status_name !== 'disapproved') {
-        switch (strtolower($_SESSION['user_role'])) {
-        case 'admin':
-            header("Location: admin_dashboard.php");
-            break;
-        case 'rental manager':
-            $chargerResult = $charger->getChargerByID($_SESSION['user_id']);
-            if ($chargerResult !== false && $chargerResult !== null) {
-                header("Location: homeowner_dashboard.php");
-            } else {
-                header("Location: add_charger.php");
-            }
-            break;
-        case 'customer':
-        default:
-            header("Location: user_dashboard.php");
-            break;
+    switch (strtolower($_SESSION['user_role'])) {
+    case 'admin':
+        header("Location: admin_dashboard.php");
+        break;
+    case 'rental manager':
+        $chargerResult = $charger->getChargerByID($_SESSION['user_id']);
+        if ($chargerResult !== false && $chargerResult !== null) {
+            header("Location: homeowner_dashboard.php");
+        } else {
+            header("Location: add_charger.php");
         }
-        exit;
-    } else {
-        switch ($status_name) {
-        case 'pending':
-            $_SESSION['login_error'] = "Your account is still pending approval";
-            break;
-        case 'deactivated':
-            $_SESSION['login_error'] = "Your account has been deactivated by the admin";
-            break;
-        case 'disapproved':
-            $_SESSION['login_error'] = "Your account request has been disapproved";
-            break;
-        default:
-            break;
-        }
+        break;
+    case 'customer':
+    default:
+        header("Location: user_dashboard.php");
+        break;
     }
+    exit;
 }
 
 // Handle login form submission
@@ -59,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $userModel->login($email, $password);
     
     if (isset($result['error'])) {
-        // Store error in session to display on the form
         $_SESSION['login_error'] = $result['error'];
         header("Location: login.php");
         exit;
@@ -67,17 +50,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $status_name = strtolower($result['status']);
     
+    if ($status_name === 'pending' || $status_name === 'deactivated' || $status_name === 'disapproved') {
+        switch ($status_name) {
+            case 'pending':
+                $_SESSION['login_error'] = "Your account is still pending approval";
+                break;
+            case 'deactivated':
+                $_SESSION['login_error'] = "Your account has been deactivated by the admin";
+                break;
+            case 'disapproved':
+                $_SESSION['login_error'] = "Your account request has been disapproved";
+                break;
+            default:
+                break;
+        }
+            
+        header("Location: login.php");
+        exit();
+    }
+
     // Set session variables
     $_SESSION['user_id'] = $result['id'];
     $_SESSION['user_role'] = $result['role'];
     $_SESSION['user_status'] = $status_name;
     $_SESSION['user_name'] = $result['name'];
-    
-    if ($status_name === 'pending' || $status_name === 'deactivated' || $status_name === 'disapproved') {
-        header("Location: login.php");
-        exit();
-    }
-    
+
     // Redirect based on role
     switch (strtolower($result['role'])) {
         case 'admin':

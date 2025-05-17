@@ -69,15 +69,15 @@ $i = 1;
               <td><?= htmlspecialchars($user['email']) ?></td>
               <td><?= htmlspecialchars($user['role_name']) ?></td>
               <td>
-                <?php if ($user['status_id'] == 1): ?>
-                  <span class="badge bg-success">Active</span>
+                <?php if ($user['status_id'] == 4 || $user['status_id'] == 2): ?>
+                  <span class="badge bg-success"><?php echo ucfirst($user['status_name']) ?></span>
                 <?php else: ?>
-                  <span class="badge bg-secondary">Deactivated</span>
+                  <span class="badge bg-secondary"><?php echo ucfirst($user['status_name']) ?></span>
                 <?php endif; ?>
               </td>
               <td>
                 <a href="../manage_users_controller.php?delete=<?= $user["user_id"] ?>" class="btn btn-sm btn-danger btn-action">Delete</a>
-                <?php if ($user["status_id"] == 1): ?>
+                <?php if ($user["status_id"] == 4 || $user["status_id"] == 2): ?>
                   <a href="../manage_users_controller.php?deactivate=<?= $user["user_id"] ?>" class="btn btn-sm btn-warning btn-action">Deactivate</a>
                 <?php else: ?>
                   <a href="../manage_users_controller.php?activate=<?= $user["user_id"] ?>" class="btn btn-sm btn-success btn-action">Activate</a>
