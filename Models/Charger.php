@@ -49,10 +49,13 @@ public function searchChargers($min_price = '',$max_price = '' , $location = '' 
                 $sql .= " AND availability = :availability";  
                 $params[':availability'] = $availability;  
             }
-               if (!empty($search_time)) {
-        $sql .= " AND :search_time BETWEEN available_from AND available_to";
-        $params[':search_time'] = $search_time;
-    }
+            
+            $sql .= " AND (availability = 'Available' OR availability = 'available')";
+            
+            if (!empty($search_time)) {
+                $sql .= " AND :search_time BETWEEN available_from AND available_to";
+                $params[':search_time'] = $search_time;
+            }
 
             $stmt = $this->conn->prepare($sql);
 

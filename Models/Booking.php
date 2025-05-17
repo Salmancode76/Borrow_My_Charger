@@ -62,10 +62,8 @@ class Booking {
     /**
      * Get bookings by customer ID with pagination
      */
-    public function getBookingsByCustomer($customer_id, $page = 1, $limit = 10) {
+    public function getBookingsByCustomer($customer_id) {
         try {
-            $offset = ($page - 1) * $limit;
-            
             $stmt = $this->conn->prepare("
                 SELECT b.*, c.charge_name, c.location, c.cost, u.first_name, u.last_name, u.email
                 FROM booking b
@@ -73,12 +71,9 @@ class Booking {
                 JOIN user u ON c.user_id = u.user_id
                 WHERE b.customer_id = :customer_id
                 ORDER BY b.date DESC
-                LIMIT :limit OFFSET :offset
             ");
             
             $stmt->bindParam(':customer_id', $customer_id);
-            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-            $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
             
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -90,10 +85,8 @@ class Booking {
     /**
      * Get bookings by charger owner ID with pagination
      */
-    public function getBookingsByChargerOwner($owner_id, $page = 1, $limit = 10) {
-        try {
-            $offset = ($page - 1) * $limit;
-            
+    public function getBookingsByChargerOwner($owner_id) {
+        try {            
             $stmt = $this->conn->prepare("
                 SELECT b.*, c.charge_name, c.location, c.cost, 
                        u.first_name as customer_first_name, u.last_name as customer_last_name, u.email as customer_email
@@ -102,12 +95,9 @@ class Booking {
                 JOIN user u ON b.customer_id = u.user_id
                 WHERE c.user_id = :owner_id
                 ORDER BY b.date DESC
-                LIMIT :limit OFFSET :offset
             ");
             
             $stmt->bindParam(':owner_id', $owner_id);
-            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-            $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
             
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -253,4 +243,3 @@ class Booking {
         }
     }
 }
-?>

@@ -143,20 +143,24 @@
           <label class="form-label">Location</label>
           <input type="text" class="form-control" name="location" placeholder="e.g. Manama" id="location" onkeyup="searchChargePoints()">
         </div>
+          
+          <div class="col-md-4">
+  <label class="form-label">Min Price per KWH</label>
+  <input type="number" step="0.01" class="form-control" name="min_price" placeholder="e.g. 0.05" id="min_price" onkeyup="searchChargePoints()">
+</div>
+
 
         <div class="col-md-4">
           <label class="form-label">Max Price per KWH</label>
           <input type="number" step="0.01" class="form-control" name="max_price" placeholder="e.g. 0.25" id="max_price" onkeyup="searchChargePoints()">
         </div>
+          
+           <div class="col-md-4">
+  <label class="form-label">Available At</label>
+  <input type="time" class="form-control" id="search_time" onchange="searchChargePoints()">
+</div>
 
-        <div class="col-md-4">
-          <label class="form-label">Availability</label>
-          <select class="form-select" name="availability" id="availability" onchange="searchChargePoints()">
-            <option value="">All</option>
-            <option value="available">Available</option>
-            <option value="not_available">Not Available</option>
-          </select>
-        </div>
+        
       </div>
     </form>
     
@@ -285,15 +289,14 @@ async function LoadMap() {
 }
 
 function searchChargePoints() {
-    const location = document.getElementById('location').value;
+     const location = document.getElementById('location').value;
+    const minPrice = document.getElementById('min_price').value;
     const maxPrice = document.getElementById('max_price').value;
-    const availability = document.getElementById('availability').value;
-    
-    // Show loading spinner
-    document.getElementById('loading').style.display = 'flex';
+        const searchTime = document.getElementById('search_time').value; // this is user-selected time
+
 
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", `user-search.php?location=${encodeURIComponent(location)}&max_price=${encodeURIComponent(maxPrice)}&availability=${encodeURIComponent(availability)}`, true);
+    xhr.open("GET", `user-search.php?location=${encodeURIComponent(location)}&min_price=${encodeURIComponent(minPrice)}&max_price=${encodeURIComponent(maxPrice)}&search_time=${encodeURIComponent(searchTime)}`, true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
     xhr.onload = function() {
@@ -348,7 +351,9 @@ function updateResultsList(chargers) {
                         <p><strong>Location:</strong> ${point.Location || 'Unknown'}</p>
                         <p><strong>Price:</strong> ${point.cost || 'N/A'} BHD</p>
                         <p><strong>Status:</strong> <span class="${statusClass}">${point.availability || 'Unknown'}</span></p>
+                                         <p><strong>Available:</strong> ${point.available_from || '00:00'} - ${point.available_to || '23:59'}</p>
                         <button class="btn btn-dark mt-2 w-100" onclick="bookCharger(${point.charger_id})">Book Now</button>
+                            
                     </div>
                 </div>
             </div>
