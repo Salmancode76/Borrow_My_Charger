@@ -138,10 +138,40 @@ class User {
         }
     }
 
-    public function deleteUser($id) {
-        $stmt = $this->conn->prepare("DELETE FROM user WHERE user_id = ?");
-        return $stmt->execute([$id]);
+ public function deleteUser($id) {
+    try {
+        // First, delete bookings made by this user
+        // Note: The column name in booking table is 'customer_id' not 'user_id'
+        $stmtUserBookings = $this->conn->prepare("DELETE FROM booking WHERE customer_id = ?");
+        $stmtUserBookings->execute([$id]);
+        
+        // Check if user has associated charge points
+        $stmtChargers = $this->conn->prepare("SELECT charger_id FROM charge_point WHERE user_id = ?");
+        $stmtChargers->execute([$id]);
+        $chargers = $stmtChargers->fetchAll(PDO::FETCH_COLUMN);
+        
+        // If user has chargers, delete bookings for those chargers first
+        if (!empty($chargers)) {
+            foreach ($chargers as $chargerId) {
+                // Delete bookings for this charger
+                $stmtChargerBookings = $this->conn->prepare("DELETE FROM booking WHERE charge_id = ?");
+                $stmtChargerBookings->execute([$chargerId]);
+            }
+            
+            // Then delete the chargers themselves
+            $stmtChargers = $this->conn->prepare("DELETE FROM charge_point WHERE user_id = ?");
+            $stmtChargers->execute([$id]);
+        }
+        
+        // Finally delete the user
+        $stmtUser = $this->conn->prepare("DELETE FROM user WHERE user_id = ?");
+        return $stmtUser->execute([$id]);
+        
+    } catch (PDOException $e) {
+        error_log("Error deleting user: " . $e->getMessage());
+        throw $e;
     }
+}
 
     public function setStatus($id, $statusId) {
         $stmt = $this->conn->prepare("UPDATE user SET status_id = ? WHERE user_id = ?");

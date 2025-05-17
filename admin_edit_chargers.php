@@ -7,8 +7,11 @@ $charger = new Charger();
 
 
 $user_id = intval($_SESSION['user_id']);
-$is_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
-
+$is_admin = ($_SESSION['user_role'] === "Admin");
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) ||  !$is_admin) {
+    header("Location: /Borrow_My_Charger/login.php");
+    exit;
+}
 
 
 // Check if this is a charger edit request

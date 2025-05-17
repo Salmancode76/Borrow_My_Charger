@@ -3,8 +3,7 @@ require_once 'Models/Charger.php';
 session_start();
 
 $customer_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
-
-if ($customer_id === 0) {
+if ($customer_id === 0 && $_SESSION['user_role'] !="Customer") {
     header("Location: /Borrow_My_Charger/login.php");
     exit;
 }

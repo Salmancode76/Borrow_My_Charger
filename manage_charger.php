@@ -7,7 +7,7 @@ $std = new stdClass();
 $charger = new Charger();
 $homeowner_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
-if ($homeowner_id === 0) {
+if ($homeowner_id === 0 && $_SESSION['user_role'] === "Rental Manager") {
     header("Location: /Borrow_My_Charger/login.php");
     exit;
 }
