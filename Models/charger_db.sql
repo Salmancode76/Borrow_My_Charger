@@ -49,7 +49,7 @@ CREATE TABLE `charge_point` (
   `longitude` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `user_id` INT(11) NOT NULL,
   `picture` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `location` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Location` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `available_from` TIME DEFAULT NULL,
   `available_to` TIME DEFAULT NULL,
   PRIMARY KEY (`charger_id`),
